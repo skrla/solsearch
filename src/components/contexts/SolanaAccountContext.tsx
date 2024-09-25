@@ -1,5 +1,5 @@
 "use client"
-import { SolanaAccount } from "@/app/types/dataAccounts";
+import { SolanaAccount } from "@/types/dataAccounts";
 import { createContext, useContext, useState, ReactNode } from "react";
 
 type SolanaAccountContextType = {

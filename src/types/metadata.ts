@@ -24,12 +24,12 @@ type NFTMetadata = {
   tokenStandard: string | undefined;
 };
 
-type NFTAttribute = {
+export type NFTAttribute = {
   trait_type: string;
   value: string;
 };
 
-type NFTAuthority = {
+export type NFTAuthority = {
   address: string;
   scopes: string[];
 };
@@ -59,13 +59,13 @@ type NFTRoyalty = {
   locked: boolean;
 };
 
-type NFTCreator = {
+export type NFTCreator = {
   address: string;
   share: number;
   verified: boolean;
 };
 
-type NFTOwnership = {
+export type NFTOwnership = {
   frozen: boolean;
   delegated: boolean;
   delegate: null;
