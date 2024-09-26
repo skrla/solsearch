@@ -10,7 +10,7 @@ import {
 } from "./converters";
 import { MetaDataAccount } from "../types/metadata";
 
-const BPF_LOADER_UPGRADE_PROGRAM_ID =
+export const BPF_LOADER_UPGRADE_PROGRAM_ID =
   "BPFLoaderUpgradeab1e11111111111111111111111";
 
 export const getAccountData = async (
@@ -19,7 +19,7 @@ export const getAccountData = async (
   accData: SolanaAccount
 ) => {
   let solanaAccount = accData;
-
+  let metadata: MetaDataAccount | undefined = undefined;
   if (solanaAccount.space !== 0) {
     if (solanaAccount.executable) {
       const programData = await getProgramData(
@@ -30,15 +30,28 @@ export const getAccountData = async (
       solanaAccount.programData = programData;
       return solanaAccount;
     }
+    if (
+      solanaAccount &&
+      solanaAccount.data &&
+      solanaAccount.data.parsed &&
+      solanaAccount.data.parsed.type === "programData"
+    ) {
+      return solanaAccount;
+    }
 
     if (
       solanaAccount.data &&
       solanaAccount.data.parsed &&
       solanaAccount.data.parsed.info !== null
     ) {
+      metadata = await getAsset(
+        conncetion.rpcEndpoint,
+        solanaAccount.data.parsed.info.mint
+      );
+      solanaAccount.metadata = metadata;
       return solanaAccount;
     }
-    const metadata = await getAsset(conncetion.rpcEndpoint, pubkey);
+    metadata = await getAsset(conncetion.rpcEndpoint, pubkey);
 
     solanaAccount.metadata = metadata;
   }
@@ -76,12 +89,29 @@ export const getFullAccountData = async (
       solanaAccount &&
       solanaAccount.data &&
       solanaAccount.data.parsed &&
-      solanaAccount.data.parsed.info !== null
+      solanaAccount.data.parsed.type === "programData"
     ) {
       return solanaAccount;
     }
-    const metadata = await getAsset(conncetion.rpcEndpoint, pubkey);
+    let metadata: MetaDataAccount | undefined;
 
+    if (
+      solanaAccount &&
+      solanaAccount.data &&
+      solanaAccount.data.parsed &&
+      solanaAccount.data.parsed.info !== null
+    ) {
+      metadata = await getAsset(
+        conncetion.rpcEndpoint,
+        solanaAccount.data.parsed.info.mint
+      );
+
+      solanaAccount.metadata = metadata;
+
+      return solanaAccount;
+    } else {
+      metadata = await getAsset(conncetion.rpcEndpoint, pubkey);
+    }
     if (solanaAccount) {
       solanaAccount.metadata = metadata;
     } else {
@@ -189,6 +219,8 @@ const getProgramData = async (
 };
 
 async function getProgramSlot(connection: Connection, pubkey: string) {
+  await delay(1000); //TODO: Remove delay, temporary here because of Helius 10 requests per second limit
+
   const signatures = await connection.getSignaturesForAddress(
     new PublicKey(pubkey),
     { limit: 1 }
@@ -197,6 +229,7 @@ async function getProgramSlot(connection: Connection, pubkey: string) {
     return 0;
   }
   const deploymentSignature = signatures[0].signature;
+  await delay(1000); //TODO: Remove delay, temporary here because of Helius 10 requests per second limit
   const transaction = await connection.getTransaction(deploymentSignature, {
     commitment: "finalized",
     maxSupportedTransactionVersion: 0,

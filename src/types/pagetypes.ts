@@ -23,12 +23,15 @@ export type AccountPageType = {
 
 export type ProgramPageType = {
   pubkey: string;
+  type: string;
   balance: number;
   executable: boolean;
-  executableData: string;
+  executableDataAccount: string;
   upgradable: boolean;
   upgradeAuth: string;
   slot: number;
+  executableData: Uint8Array;
+  sizeInKb: number;
 };
 
 export type TokenPageType = {
@@ -43,4 +46,19 @@ export type TokenPageType = {
   owner: string;
   mintAuth: string;
   freezeAuth: string;
+};
+
+export type TokenGraphType = {
+  prices: TokenPricesType[];
+  marketCap: TokenMarketCapType[];
+};
+
+export type TokenPricesType = {
+  price: number;
+  timestamp: Date;
+};
+
+export type TokenMarketCapType = {
+  marketCap: number;
+  timestamp: Date;
 };

@@ -22,12 +22,19 @@ export default function Header() {
     if (solanaAccount) {
       if (solanaAccount.space === null) {
         router.push(`/nft/${solanaAccount.pubkey}`);
+        return;
       }
       if (solanaAccount.space === 0) {
         router.push(`/account/${solanaAccount.pubkey}`);
+        return;
       }
-      if (solanaAccount.executable) {
+
+      if (
+        solanaAccount.executable ||
+        solanaAccount.data?.parsed?.infoExecutableData !== null
+      ) {
         router.push(`/program/${solanaAccount.pubkey}`);
+        return;
       }
       if (
         solanaAccount.data &&
@@ -38,11 +45,14 @@ export default function Header() {
         const decimals = solanaAccount.data.parsed.infoMint.decimals;
         if (decimals === 0) {
           router.push(`/nft/${solanaAccount.pubkey}`);
+          return;
         } else {
           router.push(`/token/${solanaAccount.pubkey}`);
+          return;
         }
       } else {
         router.push(`/token/${solanaAccount.pubkey}`);
+        return;
       }
     }
   }, [solanaAccount?.pubkey]);

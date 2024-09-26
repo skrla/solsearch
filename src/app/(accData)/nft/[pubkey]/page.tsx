@@ -13,7 +13,7 @@ export default function NFTPage() {
       const nftDataConv = convertToNftPageType(solanaAccount.metadata);
       setNftData(nftDataConv);
     }
-  }, []);
+  }, [solanaAccount?.pubkey]);
 
   return nftData ? (
     <div className="flex flex-col p-5 items-center w-full">

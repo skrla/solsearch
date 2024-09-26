@@ -4,6 +4,7 @@ import {
   Extension,
   ParsedAccount,
   ProgramData,
+  ProgramExecutableData,
   SolanaAccount,
   TokenInfoData,
   TokenMintInfoData,
@@ -16,8 +17,8 @@ import {
   ProgramPageType,
   TokenPageType,
 } from "@/types/pagetypes";
-import { stat } from "fs";
 import { TOKEN_2022_PROGRAM_ID } from "@solana/spl-token";
+import { BPF_LOADER_UPGRADE_PROGRAM_ID } from "./accountData";
 
 export function convertToSolanaAccountType(
   rawData: any,
@@ -28,6 +29,7 @@ export function convertToSolanaAccountType(
   let tokenMintData: TokenMintInfoData | null = null;
   let dataAccount: DataAccount | null = null;
   let programData: ProgramData | null = null;
+  let executableData: ProgramExecutableData | null = null;
   if (value.data.program) {
     if ("programData" in value.data.parsed.info) {
       programData = {
@@ -68,6 +70,17 @@ export function convertToSolanaAccountType(
         owner: value.data.parsed.info.owner,
         state: value.data.parsed.info.state,
         tokenAmount: tokenAmount,
+      };
+    }
+    if (value.data.parsed.type === "programData") {
+      const data: string[] = [];
+      value.data.parsed.info.data.forEach((e: string) => {
+        data.push(e);
+      });
+      executableData = {
+        authority: value.data.parsed.info.authority,
+        slot: value.data.parsed.info.slot,
+        executableData: data,
       };
     } else {
       const exts: Extension[] = [];
@@ -114,11 +127,11 @@ export function convertToSolanaAccountType(
           }
         : null;
     }
-
     const parsedAccount: ParsedAccount = {
       type: value.data.parsed.type,
       info: tokenData,
       infoMint: tokenMintData,
+      infoExecutableData: executableData,
     };
 
     dataAccount = {
@@ -273,14 +286,43 @@ export function convertToProgramPageType(
   const balance = solanaAccount.lamports
     ? solanaAccount.lamports / LAMPORTS_PER_SOL
     : 0;
+  const type = solanaAccount.executable ? "program" : "programData";
+  let executableDataAccount = "";
+  let upgradable = false;
+  let upgradeAuth = "";
+  let slot = 0;
+  let data: Uint8Array = new Uint8Array(0);
+  let size = 0;
+
+  if (type === "program") {
+    executableDataAccount = solanaAccount.programData?.executableData || "";
+    upgradable = solanaAccount.programData?.upgradable || false;
+    upgradeAuth = solanaAccount.programData?.upgradeAuth || "";
+    slot = solanaAccount.programData?.slot || 0;
+  }
+  if (type === "programData") {
+    data = base64ToUint8Array(
+      solanaAccount.data?.parsed?.infoExecutableData?.executableData[0] || ""
+    );
+    upgradable =
+      solanaAccount.owner?.toString() === BPF_LOADER_UPGRADE_PROGRAM_ID;
+    upgradeAuth =
+      solanaAccount.data?.parsed?.infoExecutableData?.authority || "";
+    slot = solanaAccount.data?.parsed?.infoExecutableData?.slot || 0;
+    size = Math.round((data.length / 1024) * 100) / 100;
+  }
+
   return {
     pubkey: solanaAccount.pubkey.toString(),
+    type: type,
     balance: balance,
     executable: solanaAccount.executable || false,
-    executableData: solanaAccount.programData?.executableData || "",
-    upgradable: solanaAccount.programData?.upgradable || false,
-    upgradeAuth: solanaAccount.programData?.upgradeAuth || "",
-    slot: solanaAccount.programData?.slot || 0,
+    executableDataAccount: executableDataAccount,
+    upgradable: upgradable,
+    upgradeAuth: upgradeAuth,
+    slot: slot,
+    executableData: data,
+    sizeInKb: size,
   };
 }
 
@@ -330,4 +372,17 @@ export function convertToTokenPageType(
     mintAuth: mintAuth,
     freezeAuth: freezeAuth,
   };
+}
+
+function base64ToUint8Array(data: string) {
+  const binaryString = atob(data);
+
+  const length = binaryString.length;
+  const bytes = new Uint8Array(length);
+
+  for (let i = 0; i < length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+
+  return bytes;
 }

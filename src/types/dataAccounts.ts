@@ -23,6 +23,7 @@ export type ParsedAccount = {
   type: string;
   info: TokenInfoData | null;
   infoMint: TokenMintInfoData | null;
+  infoExecutableData: ProgramExecutableData | null;
 };
 
 export type TokenMintInfoData = {
@@ -40,6 +41,12 @@ export type TokenInfoData = {
   owner: string;
   state: string;
   tokenAmount: TokenAmount | undefined;
+};
+
+export type ProgramExecutableData = {
+  authority: string;
+  slot: number;
+  executableData: string[];
 };
 
 export type ProgramData = {
