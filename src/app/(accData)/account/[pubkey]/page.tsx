@@ -3,7 +3,6 @@
 import { convertToAccountPageType } from "@/backend/converters";
 import { useSolanaAccount } from "@/components/contexts/SolanaAccountContext";
 import { AccountPageType } from "@/types/pagetypes";
-import { LAMPORTS_PER_SOL, SystemProgram } from "@solana/web3.js";
 import { useEffect, useState } from "react";
 
 export default function AccountInfo() {

@@ -1,5 +1,5 @@
 "use client";
-import Input from "./input";
+import Input from "../../components/Input";
 import { useConnection } from "@solana/wallet-adapter-react";
 import { useSolanaAccount } from "../../components/contexts/SolanaAccountContext";
 import { getAccountInfo } from "@/backend/accountData";
@@ -12,6 +12,13 @@ export default function Header() {
   const { solanaAccount, setSolanaAccount } = useSolanaAccount();
 
   const onClick = async (pubkey: string) => {
+    if (pubkey.length > 60) {
+      const tx = await connection.getParsedTransaction(pubkey, {
+        commitment: "finalized",
+        maxSupportedTransactionVersion: 0,
+      });
+      return;
+    }
     const accountData = await getAccountInfo(connection, pubkey);
     if (accountData) {
       setSolanaAccount(accountData);

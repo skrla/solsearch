@@ -1,7 +1,7 @@
 import "./globals.css";
 import AppWalletProvider from "../components/contexts/AppWalletProvider";
 import Header from "./common/header";
-import Footer from "./common/footer";
+import Footer from "../components/Footer";
 import { SolanaAccountProvider } from "../components/contexts/SolanaAccountContext";
 
 export default function RootLayout({
