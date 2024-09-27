@@ -16,6 +16,7 @@ const config: Config = {
         border: "#414141",
         dark: "#2C2C2C",
         darker: "#232323",
+        purple: "#9747FF",
       },
       backgroundImage: {
         solanaLinearGradient:
