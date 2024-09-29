@@ -51,8 +51,8 @@ export const getAccountData = async (
       solanaAccount.metadata = metadata;
       return solanaAccount;
     }
-    metadata = await getAsset(conncetion.rpcEndpoint, pubkey);
 
+    metadata = await getAsset(conncetion.rpcEndpoint, pubkey);
     solanaAccount.metadata = metadata;
   }
   return solanaAccount;
@@ -147,7 +147,7 @@ export const getAccountInfo = async (
   }
   if (accountData.value === null) {
     solanaAccount = {
-      metadata: undefined,
+      metadata: null,
       data: null,
       executable: null,
       lamports: null,

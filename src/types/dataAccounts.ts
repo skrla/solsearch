@@ -9,7 +9,7 @@ export type SolanaAccount = {
   rentEpoch: number | null;
   space: number | null;
   data: DataAccount | null;
-  metadata: MetaDataAccount | undefined;
+  metadata: MetaDataAccount | null;
   programData: ProgramData | null;
 };
 

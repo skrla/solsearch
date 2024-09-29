@@ -1,21 +1,42 @@
 "use client";
+import { getAccountData, getFullAccountData } from "@/backend/accountData";
 import { convertToTokenPageType } from "@/backend/converters";
-import { graphDataToken } from "@/backend/graphData";
 import { useSolanaAccount } from "@/components/contexts/SolanaAccountContext";
 import TokenChart from "@/components/TokenChart";
 import { TokenPageType } from "@/types/pagetypes";
+import { useConnection } from "@solana/wallet-adapter-react";
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function TokensPage() {
-  const { solanaAccount } = useSolanaAccount();
   const [tokenData, setTokenData] = useState<TokenPageType>();
+  const { solanaAccount, setSolanaAccount } = useSolanaAccount();
+  const { connection } = useConnection();
+  const params = useParams();
 
   useEffect(() => {
-    if (solanaAccount) {
-      const tokenDataConv = convertToTokenPageType(solanaAccount);
-      setTokenData(tokenDataConv);
+    async function getData() {
+      let fullSolanaAccount;
+      if (solanaAccount) {
+        fullSolanaAccount = await getAccountData(
+          connection,
+          solanaAccount.pubkey,
+          solanaAccount
+        );
+      } else {
+        fullSolanaAccount = await getFullAccountData(
+          connection,
+          params.pubkey as string
+        );
+      }
+      setSolanaAccount(fullSolanaAccount ? fullSolanaAccount : null);
+      if (fullSolanaAccount) {
+        const tokenDataConv = convertToTokenPageType(fullSolanaAccount);
+        setTokenData(tokenDataConv);
+      }
     }
-  }, [solanaAccount?.pubkey]);
+    getData();
+  }, []);
 
   return (
     <>

@@ -3,7 +3,7 @@
 import { getAccountData, getFullAccountData } from "@/backend/accountData";
 import { useSolanaAccount } from "@/components/contexts/SolanaAccountContext";
 import { useConnection } from "@solana/wallet-adapter-react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useEffect } from "react";
 
 export default function AccountsData({
@@ -17,22 +17,22 @@ export default function AccountsData({
 
   useEffect(() => {
     async function getData() {
+      let fullSolanaAccount;
       if (solanaAccount) {
-        const fullSolanaAccount = await getAccountData(
+        fullSolanaAccount = await getAccountData(
           connection,
           solanaAccount.pubkey,
           solanaAccount
         );
-        setSolanaAccount(fullSolanaAccount ? fullSolanaAccount : null);
       } else {
-        const fullSolanaAccount = await getFullAccountData(
+        fullSolanaAccount = await getFullAccountData(
           connection,
           params.pubkey as string
         );
-        setSolanaAccount(fullSolanaAccount ? fullSolanaAccount : null);
       }
+      setSolanaAccount(fullSolanaAccount ? fullSolanaAccount : null);
     }
     getData();
-  }, [solanaAccount?.pubkey]);
+  }, []);
   return <div className="p-10 w-full">{children}</div>;
 }

@@ -11,7 +11,7 @@ function Title({ title }: TitleProps) {
       <h2 className="text-6xl bg-solanaLinearGradient text-transparent bg-clip-text">
         {title}
       </h2>
-      <hr className="bg-solanaLinearGradient h-1 w-full ml-3" />
+      <hr className="bg-solanaLinearGradient h-1 w-full mx-5" />
     </div>
   );
 }

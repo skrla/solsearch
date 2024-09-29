@@ -9,6 +9,8 @@ export type NftPageType = {
   collection: string;
   website: string;
   royalties: number;
+  primarySaleHappened: boolean;
+  locked: boolean;
   creators: NFTCreator[];
   owner: NFTOwnership;
   attributes: NFTAttribute[] | undefined;
@@ -32,6 +34,7 @@ export type ProgramPageType = {
   slot: number;
   executableData: Uint8Array;
   sizeInKb: number;
+  deploymentTimestamp: Date | null;
 };
 
 export type TokenPageType = {

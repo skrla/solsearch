@@ -49,7 +49,7 @@ export function convertToSolanaAccountType(
         rentEpoch: value.rentEpoch,
         space: value.space,
         data: dataAccount,
-        metadata: undefined,
+        metadata: null,
       };
 
       return solanaAccount;
@@ -150,7 +150,7 @@ export function convertToSolanaAccountType(
     rentEpoch: value.rentEpoch,
     space: value.space,
     data: dataAccount,
-    metadata: undefined,
+    metadata: null,
   };
 
   return solanaAccount;
@@ -252,10 +252,12 @@ export function convertToNftPageType(metadata: MetaDataAccount): NftPageType {
     pubkey: metadata.id,
     collection: collection,
     website: metadata.links?.external_url || "",
-    royalties: metadata.royalty.percent,
+    royalties: metadata.royalty.percent * 100 || 0,
     creators: metadata.creators,
     owner: metadata.ownership,
     attributes: metadata.metadata.attributes,
+    primarySaleHappened: metadata.royalty.primarySaleHappened || false,
+    locked: metadata.royalty.locked || false,
   };
 }
 
@@ -293,12 +295,15 @@ export function convertToProgramPageType(
   let slot = 0;
   let data: Uint8Array = new Uint8Array(0);
   let size = 0;
+  let timestamp: Date | null = new Date();
+  let time: number = 0;
 
   if (type === "program") {
     executableDataAccount = solanaAccount.programData?.executableData || "";
     upgradable = solanaAccount.programData?.upgradable || false;
     upgradeAuth = solanaAccount.programData?.upgradeAuth || "";
     slot = solanaAccount.programData?.slot || 0;
+    time = solanaAccount.programData?.deploymentTimestamp || 0;
   }
   if (type === "programData") {
     data = base64ToUint8Array(
@@ -312,6 +317,10 @@ export function convertToProgramPageType(
     size = Math.round((data.length / 1024) * 100) / 100;
   }
 
+  if (time !== 0) {
+    timestamp = new Date(time * 1000);
+  }
+
   return {
     pubkey: solanaAccount.pubkey.toString(),
     type: type,
@@ -323,6 +332,7 @@ export function convertToProgramPageType(
     slot: slot,
     executableData: data,
     sizeInKb: size,
+    deploymentTimestamp: timestamp,
   };
 }
 
