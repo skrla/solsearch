@@ -13,6 +13,8 @@ import {
 import { MetaDataAccount } from "../types/metadata";
 import {
   AccountPageType,
+  AssetsNFT,
+  AssetsToken,
   NftPageType,
   ProgramPageType,
   TokenPageType,
@@ -279,6 +281,7 @@ export function convertToAccountPageType(
     balance: balance,
     executable: solanaAccount.executable ? true : false,
     owner: ownerPubkey || "",
+    assets: null,
   };
 }
 
@@ -382,6 +385,62 @@ export function convertToTokenPageType(
     mintAuth: mintAuth,
     freezeAuth: freezeAuth,
   };
+}
+
+export function convertToTokenAssets(json: any): AssetsToken[] {
+  let tokenAssets: AssetsToken[] = [];
+  if (json !== null) {
+    if (json.items !== null && json.items.length > 0) {
+      for (let i = 0; i < json.items.length; i++) {
+        const item = json.items[i];
+        if (item.id === null || !item.token_info) continue;
+        if (item.token_info.decimals === 0) continue;
+        const pubkey = item.id;
+        const name = item.content?.metadata?.symbol || "";
+        const balance = item.token_info?.price_info?.total_price || 0;
+        const img = item.content.files[0].uri || "";
+        tokenAssets.push({
+          name: name,
+          img: img,
+          pubkey: pubkey,
+          balance: balance,
+        });
+      }
+    }
+  }
+  return tokenAssets;
+}
+
+export async function convertToNFTAssets(json: any): Promise<AssetsNFT[]> {
+  let tokenAssets: AssetsNFT[] = [];
+  if (json !== null) {
+    if (json.items !== null && json.items.length > 0) {
+      for (let i = 0; i < json.items.length; i++) {
+        const item = json.items[i];
+        if (item.id === null || item.interface !== "V1_NFT") continue;
+        const pubkey = item.id;
+        const name = item.content?.metadata?.name || "";
+        const img = item.content?.files[0]?.uri || "";
+        let mime = "image/png";
+        try {
+          const response = await fetch(img, { method: "HEAD" });
+          if (response.ok) {
+            const contentType = response.headers.get("Content-Type");
+            mime = contentType || "image/png";
+          }
+        } catch (error) {
+          mime = "image/png";
+        }
+        tokenAssets.push({
+          name: name,
+          img: img,
+          pubkey: pubkey,
+          mime: mime,
+        });
+      }
+    }
+  }
+  return tokenAssets;
 }
 
 function base64ToUint8Array(data: string) {

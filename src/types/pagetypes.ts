@@ -21,6 +21,26 @@ export type AccountPageType = {
   balance: number;
   executable: boolean;
   owner: string;
+  assets: AccountAssets | null;
+};
+
+export type AccountAssets = {
+  assetsNft: AssetsNFT[];
+  assetsToken: AssetsToken[];
+};
+
+export type AssetsNFT = {
+  name: string;
+  img: string;
+  pubkey: string;
+  mime: string;
+};
+
+export type AssetsToken = {
+  name: string;
+  img: string;
+  pubkey: string;
+  balance: number;
 };
 
 export type ProgramPageType = {

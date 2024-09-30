@@ -45,7 +45,7 @@ export default function TokensPage() {
 
   return tokenData ? (
     <main className="flex flex-col xl:max-w-[1300px] 2xl:max-w-[1700px] mx-auto ">
-      <Title title={solanaAccount?.data === null ? "cNFT" : "NFT"} />
+      <Title title={tokenData.type === "mint" ? "Token Mint" : "Token"} />
       <div className="w-full flex justify-center items-start">
         <MainInfo img={tokenData.img || ""} />
         <div className="w-full flex flex-col my-5 bg-dark">
@@ -87,7 +87,7 @@ export default function TokensPage() {
           </AccountDataGroup>
         </div>
       </div>
-      {tokenData.type === "Mint" ? (
+      {tokenData.type === "mint" ? (
         <TokenChart
           mintPubkey={tokenData.pubkey}
           name={tokenData.name}

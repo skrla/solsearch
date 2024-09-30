@@ -1,14 +1,13 @@
-import {
-  BPF_LOADER_DEPRECATED_PROGRAM_ID,
-  Connection,
-  PublicKey,
-} from "@solana/web3.js";
+import { Connection, PublicKey } from "@solana/web3.js";
 import { ProgramData, SolanaAccount } from "../types/dataAccounts";
 import {
   convertToMetaDataAccountType,
+  convertToNFTAssets,
   convertToSolanaAccountType,
+  convertToTokenAssets,
 } from "./converters";
 import { MetaDataAccount } from "../types/metadata";
+import { AccountAssets, AssetsNFT, AssetsToken } from "@/types/pagetypes";
 
 export const BPF_LOADER_UPGRADE_PROGRAM_ID =
   "BPFLoaderUpgradeab1e11111111111111111111111";
@@ -263,7 +262,10 @@ async function getProgramUpgradeAuth(connection: Connection, pubkey: string) {
   }
 }
 
-async function getAssetsByOwner(conncetion: Connection, pubkey: string) {
+export async function getAssetsByOwner(
+  conncetion: Connection,
+  pubkey: string
+): Promise<AccountAssets | null> {
   const response = await fetch(conncetion.rpcEndpoint, {
     method: "POST",
     headers: {
@@ -284,10 +286,19 @@ async function getAssetsByOwner(conncetion: Connection, pubkey: string) {
     }),
   });
   const { result } = await response.json();
-  console.log("Assets by Owner: ", result.items);
+  const tokenAssets: AssetsToken[] = convertToTokenAssets(result);
+  const nftAssets: AssetsNFT[] = await convertToNFTAssets(result);
+  const assets: AccountAssets = {
+    assetsToken: tokenAssets,
+    assetsNft: nftAssets,
+  };
+  return assets || null;
 }
 
-async function getCollectionData(conncetion: Connection, pubkey: string) {
+export async function getCollectionData(
+  conncetion: Connection,
+  pubkey: string
+) {
   const response = await fetch(conncetion.rpcEndpoint, {
     method: "POST",
     headers: {

@@ -1,9 +1,7 @@
 import React from "react";
 import FieldTitle from "./fields/FieldTitle";
-import FieldPubkey from "./fields/FieldPubkey";
 import FieldString from "./fields/FieldString";
 import FieldBoolean from "./fields/FieldBoolean";
-import { string } from "@metaplex-foundation/umi/serializers";
 
 type AccountDataProps = {
   title?: string;
