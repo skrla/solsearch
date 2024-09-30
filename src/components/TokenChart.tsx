@@ -56,14 +56,6 @@ const TokenChart = ({ mintPubkey, name, decimals }: TokenChartProps) => {
           borderColor: "blue",
           fill: false,
         },
-        // {
-        //   label: "Market Cap",
-        //   data: tokenChartData?.marketCap.map(
-        //     (m: { marketCap: number }) => m.marketCap
-        //   ),
-        //   borderColor: "green",
-        //   fill: false,
-        // },
       ],
     });
   };
@@ -88,13 +80,13 @@ const TokenChart = ({ mintPubkey, name, decimals }: TokenChartProps) => {
       },
       title: {
         display: true,
-        text: `${name} Price and Market Cap`,
+        text: `${name} Price `,
       },
       tooltip: {
         callbacks: {
           label: function (context: any) {
             const price = context.raw;
-            return `Price: $${price.toFixed(9)}`;
+            return `Price: $${price.toFixed(decimals)}`;
           },
         },
       },
@@ -104,7 +96,7 @@ const TokenChart = ({ mintPubkey, name, decimals }: TokenChartProps) => {
         type: "linear",
         ticks: {
           callback: function (value: string | number) {
-            return typeof value === "number" ? value.toFixed(9) : value;
+            return typeof value === "number" ? value.toFixed(decimals) : value;
           },
         },
       },
@@ -112,7 +104,7 @@ const TokenChart = ({ mintPubkey, name, decimals }: TokenChartProps) => {
   };
 
   return (
-    <div>
+    <div className="flex w-full h-[600px] p-5 items-center justify-center xl:max-w-[1000px] 2xl:max-w-[1400px] mx-auto bg-dark ">
       {chartData ? (
         <Line data={chartData} options={options} />
       ) : (

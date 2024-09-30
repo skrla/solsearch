@@ -17,10 +17,15 @@ const config: Config = {
         dark: "#2C2C2C",
         darker: "#232323",
         purple: "#9747FF",
+        input: "#353535",
       },
       backgroundImage: {
         solanaLinearGradient:
           "linear-gradient(44.76deg, #9945FF 10.43%, #8752F3 30.84%, #5497D5 49.4%, #43B4CA 58.68%, #28E0B9 69.81%, #19FB9B 93.01%)",
+      },
+      fontFamily: {
+        lato: ["Lato", "sans-serif"],
+        open: ["Open Sans", "sans-serif"],
       },
     },
   },

@@ -17,7 +17,6 @@ import { AccountAssets, AccountPageType } from "@/types/pagetypes";
 import { useConnection } from "@solana/wallet-adapter-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import Swiper from "swiper";
 
 export default function AccountInfo() {
   const { solanaAccount, setSolanaAccount } = useSolanaAccount();
@@ -25,8 +24,6 @@ export default function AccountInfo() {
 
   const { connection } = useConnection();
   const params = useParams();
-
-
 
   useEffect(() => {
     async function getData() {
@@ -63,12 +60,11 @@ export default function AccountInfo() {
     <main className="flex flex-col xl:max-w-[1300px] 2xl:max-w-[1700px] mx-auto ">
       <Title title="Account" />
       <div className="w-full flex justify-center items-start">
-        <MainInfo img="" />
         <AccountDataGroup>
           <AccountDataRow>
             <AccountData pubkey={accountData.pubkey} title="Pubkey" />
             <AccountData
-              name={accountData.balance.toString()}
+              name={accountData.balance.toLocaleString()}
               title="Balance"
             />
             <AccountData name="Account" title="Type" />
@@ -82,12 +78,22 @@ export default function AccountInfo() {
       </div>
       {accountData.assets !== null && (
         <>
-          <div className="flex justify-center items-start xl:max-w-[1300px] 2xl:max-w-[1700px] mx-auto my-9">
-            <SwiperData tokenAssets={accountData.assets.assetsToken} />
-          </div>
-          <div className="flex justify-center items-start xl:max-w-[1300px] 2xl:max-w-[1700px] mx-auto my-9">
-            <SwiperData nftAssets={accountData.assets.assetsNft} />
-          </div>
+          {accountData.assets.assetsToken.length > 0 && (
+            <div className="flex flex-col justify-center items-center xl:max-w-[1300px] 2xl:max-w-[1700px] mx-auto my-9 p-5 bg-dark">
+              <Title title="TOKEN" />
+              <div className="flex justify-center items-center xl:max-w-[1300px] 2xl:max-w-[1700px] mx-auto my-9">
+                <SwiperData tokenAssets={accountData.assets.assetsToken} />
+              </div>
+            </div>
+          )}
+          {accountData.assets.assetsNft.length > 0 && (
+            <div className="flex flex-col justify-center items-center xl:max-w-[1300px] 2xl:max-w-[1700px] mx-auto my-9 p-5 bg-dark">
+              <Title title="NFT" />
+              <div className="flex justify-center items-center xl:max-w-[1300px] 2xl:max-w-[1700px] mx-auto my-9">
+                <SwiperData nftAssets={accountData.assets.assetsNft} />
+              </div>
+            </div>
+          )}
         </>
       )}
     </main>

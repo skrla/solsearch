@@ -1,7 +1,7 @@
 "use client";
 import { convertToNftPageType } from "@/backend/converters";
 import { useSolanaAccount } from "@/components/contexts/SolanaAccountContext";
-import { NftPageType } from "@/types/pagetypes";
+import { AssetsNFT, NftPageType } from "@/types/pagetypes";
 import { useEffect, useState } from "react";
 import AccountDataRow from "@/components/accounts/AccountDataRow";
 import Title from "@/components/Title";
@@ -10,9 +10,14 @@ import AccountData from "@/components/accounts/AccountData";
 import AccountDataGroup from "@/components/accounts/AccountDataGroup";
 import RowTitle from "@/components/accounts/RowTitle";
 import { NFTAttribute } from "@/types/metadata";
-import { getAccountData, getFullAccountData } from "@/backend/accountData";
+import {
+  getAccountData,
+  getCollectionData,
+  getFullAccountData,
+} from "@/backend/accountData";
 import { useConnection } from "@solana/wallet-adapter-react";
 import { useParams } from "next/navigation";
+import SwiperData from "@/components/SwiperData";
 
 export default function NFTPage() {
   const { solanaAccount, setSolanaAccount } = useSolanaAccount();
@@ -22,6 +27,8 @@ export default function NFTPage() {
   const [chunkedAttributes, setChunkedAttributes] = useState<NFTAttribute[][]>(
     []
   );
+
+  const [collection, setCollection] = useState<AssetsNFT[]>([]);
 
   const fillChunkedAttributes = () => {
     if (nftData && nftData.attributes && nftData.attributes.length > 0) {
@@ -56,6 +63,13 @@ export default function NFTPage() {
           fullSolanaAccount?.metadata || null
         );
         setNftData(nftDataConv);
+        if (nftDataConv.collection !== "") {
+          const coll = await getCollectionData(
+            connection,
+            nftDataConv.collection
+          );
+          setCollection(coll);
+        }
       }
     }
     getData();
@@ -75,9 +89,9 @@ export default function NFTPage() {
         <div className="w-full flex flex-col my-5 bg-dark">
           <AccountDataGroup>
             <AccountDataRow>
+              <AccountData pubkey={nftData.pubkey} title="NFT pubkey" />
               <AccountData name={nftData.name} title="NFT name" />
               <AccountData name={nftData.type} title="NFT type" />
-              <AccountData pubkey={nftData.pubkey} title="NFT pubkey" />
             </AccountDataRow>
             <AccountDataRow>
               <AccountData pubkey={nftData.collection} title="NFT collection" />
@@ -93,59 +107,66 @@ export default function NFTPage() {
               <AccountData boolean={nftData.owner.frozen} title="Frozen" />
             </AccountDataRow>
           </AccountDataGroup>
-          <AccountDataGroup>
-            <RowTitle title="Royalties" />
-            <AccountDataRow>
-              <AccountData
-                name={nftData.royalties.toString() + "%"}
-                title="Royalties"
-              />
-              <AccountData
-                boolean={nftData.primarySaleHappened}
-                title="Primary sale happened"
-              />
-              <AccountData boolean={nftData.locked} title="Locked" />
-            </AccountDataRow>
-            {nftData.creators.length > 0 &&
-              nftData.creators.map((creator) => (
-                <AccountDataRow>
-                  <AccountData
-                    pubkey={creator.address}
-                    title="Creator pubkey"
-                  />
-                  <AccountData
-                    name={`${creator.share.toString()}%`}
-                    title="Creator share"
-                  />
-                  <AccountData
-                    boolean={creator.verified}
-                    title="Verified creator"
-                  />
-                </AccountDataRow>
-              ))}
-          </AccountDataGroup>
-          {chunkedAttributes.length > 0 && (
-            <AccountDataGroup>
-              <RowTitle title="Attributes" />
-              {chunkedAttributes.map((chunk, index) => (
-                <AccountDataRow key={index}>
-                  {chunk.map((att, subIndex) => (
-                    <AccountData
-                      key={subIndex}
-                      name={att.value}
-                      title={att.trait_type}
-                    />
-                  ))}
-                </AccountDataRow>
-              ))}
-            </AccountDataGroup>
-          )}
-          <AccountDataGroup>
-            <AccountDataRow>
-              <AccountData name={nftData.description} title="NFT description" />
-            </AccountDataRow>
-          </AccountDataGroup>
         </div>
+      </div>
+      <div className="w-full flex flex-col justify-center items-start bg-dark mx-5 rounded-md">
+        <AccountDataGroup>
+          <RowTitle title="Royalties" />
+          <AccountDataRow>
+            <AccountData
+              name={nftData.royalties.toString() + "%"}
+              title="Royalties"
+            />
+            <AccountData
+              boolean={nftData.primarySaleHappened}
+              title="Primary sale happened"
+            />
+            <AccountData boolean={nftData.locked} title="Locked" />
+          </AccountDataRow>
+          {nftData.creators.length > 0 &&
+            nftData.creators.map((creator) => (
+              <AccountDataRow>
+                <AccountData pubkey={creator.address} title="Creator pubkey" />
+                <AccountData
+                  name={`${creator.share.toString()}%`}
+                  title="Creator share"
+                />
+                <AccountData
+                  boolean={creator.verified}
+                  title="Verified creator"
+                />
+              </AccountDataRow>
+            ))}
+        </AccountDataGroup>
+        {chunkedAttributes.length > 0 && (
+          <AccountDataGroup>
+            <RowTitle title="Attributes" />
+            {chunkedAttributes.map((chunk, index) => (
+              <AccountDataRow key={index}>
+                {chunk.map((att, subIndex) => (
+                  <AccountData
+                    key={subIndex}
+                    name={att.value}
+                    title={att.trait_type}
+                  />
+                ))}
+              </AccountDataRow>
+            ))}
+          </AccountDataGroup>
+        )}
+        <AccountDataGroup>
+          <AccountDataRow>
+            <AccountData name={nftData.description} title="NFT description" />
+          </AccountDataRow>
+        </AccountDataGroup>
+        {collection.length > 0 && (
+          <div className="flex flex-col justify-center items-center xl:max-w-[1300px] 2xl:max-w-[1700px] mx-auto my-9 p-5 bg-dark">
+            <Title title="Collection" />
+            <div className="flex justify-center items-center xl:max-w-[1300px] 2xl:max-w-[1700px] mx-auto my-9">
+              <SwiperData nftAssets={collection} />
+            </div>
+          </div>
+        )}
       </div>
     </main>
   ) : null;

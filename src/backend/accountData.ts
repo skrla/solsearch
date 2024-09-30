@@ -192,20 +192,20 @@ const getAsset = async (
 };
 
 const getProgramData = async (
-  conncetion: Connection,
+  connection: Connection,
   pubkey: string,
   solanaAccount: SolanaAccount
 ): Promise<ProgramData> => {
   const upgradable =
     solanaAccount.owner?.toString() === BPF_LOADER_UPGRADE_PROGRAM_ID;
 
-  const slot = await getProgramSlot(conncetion, pubkey);
+  const slot = await getProgramSlot(connection, pubkey);
   await delay(1000); //TODO: Remove delay, temporary here because of Helius 10 requests per second limit
-  const timestamp = await conncetion.getBlockTime(slot);
+  const timestamp = await connection.getBlockTime(slot);
   let authority = "";
 
   if (upgradable) {
-    authority = await getProgramUpgradeAuth(conncetion, pubkey);
+    authority = await getProgramUpgradeAuth(connection, pubkey);
   }
 
   return {
@@ -298,7 +298,7 @@ export async function getAssetsByOwner(
 export async function getCollectionData(
   conncetion: Connection,
   pubkey: string
-) {
+): Promise<AssetsNFT[] | []> {
   const response = await fetch(conncetion.rpcEndpoint, {
     method: "POST",
     headers: {
@@ -317,10 +317,11 @@ export async function getCollectionData(
     }),
   });
   const { result } = await response.json();
-  console.log("Assets by Group: ", result.items);
+  const nftAssets: AssetsNFT[] = await convertToNFTAssets(result);
+  return nftAssets || [];
 }
 
 //TODO: Remove delay, temporary here because of Helius 10 requests per second limit
-const delay = (ms: number) => {
+export const delay = (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };

@@ -1,4 +1,5 @@
 "use client";
+import Title from "@/components/Title";
 import { useConnection } from "@solana/wallet-adapter-react";
 import { ParsedTransactionWithMeta } from "@solana/web3.js";
 import { useParams } from "next/navigation";
@@ -24,7 +25,18 @@ const TransactionPage = () => {
     getTransactionFromParams();
   }, []);
 
-  return <div>Transaction</div>;
+  return (
+    <main className="flex flex-col xl:max-w-[1300px] 2xl:max-w-[1700px] mx-auto ">
+      <Title title="Transaction" />
+      <div className="w-full flex flex-col my-5 bg-dark p-5">
+        {transaction?.meta?.logMessages?.map((tx, index: number) => (
+          (index+1) < 10 ? 
+          <pre> {index +1}  {tx}</pre>
+          : <pre>{index +1}  {tx}</pre>
+        ))}
+      </div>
+    </main>
+  );
 };
 
 export default TransactionPage;

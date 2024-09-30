@@ -19,7 +19,6 @@ import {
   ProgramPageType,
   TokenPageType,
 } from "@/types/pagetypes";
-import { TOKEN_2022_PROGRAM_ID } from "@solana/spl-token";
 import { BPF_LOADER_UPGRADE_PROGRAM_ID } from "./accountData";
 
 export function convertToSolanaAccountType(
@@ -123,7 +122,7 @@ export function convertToSolanaAccountType(
             decimals: value.data.parsed.info.decimals,
             freezeAuthority: value.data.parsed.info.freezeAuthority,
             isInitialized: value.data.parsed.info.boolean,
-            mintAuthority: value.data.parsed.info.string,
+            mintAuthority: value.data.parsed.info.mintAuthority,
             supply: value.data.parsed.info.supply,
             extensions: exts,
           }
@@ -298,7 +297,7 @@ export function convertToProgramPageType(
   let slot = 0;
   let data: Uint8Array = new Uint8Array(0);
   let size = 0;
-  let timestamp: Date | null = new Date();
+  let timestamp: Date | null = null;
   let time: number = 0;
 
   if (type === "program") {
@@ -353,14 +352,20 @@ export function convertToTokenPageType(
   let owner = "";
   if (solanaAccount.data !== null && solanaAccount.data.parsed !== null) {
     const parsedData = solanaAccount.data.parsed;
-    if (parsedData.infoMint !== null) {
-      type = parsedData.type;
-      supply = parsedData.infoMint.supply;
-      decimals = parsedData.infoMint.decimals;
-      mintAuth = parsedData.infoMint.mintAuthority;
-      freezeAuth = parsedData.infoMint.freezeAuthority;
-      tokenExt =
-        solanaAccount.owner?.toString() === TOKEN_2022_PROGRAM_ID.toBase58();
+    if (parsedData.type === "mint") {
+      if (parsedData.infoMint !== null) {
+        type = parsedData.type;
+        supply = parsedData.infoMint.supply;
+        decimals = parsedData.infoMint.decimals;
+        mintAuth = parsedData.infoMint.mintAuthority;
+        freezeAuth = parsedData.infoMint.freezeAuthority;
+        if (
+          parsedData.infoMint.extensions &&
+          parsedData.infoMint.extensions.length > 0
+        ) {
+          tokenExt = true;
+        }
+      }
       owner = solanaAccount.owner?.toString() || "";
     } else {
       if (parsedData.info !== null) {
@@ -371,6 +376,8 @@ export function convertToTokenPageType(
         balance = parsedData.info.tokenAmount?.uiAmount || 0;
       }
     }
+    if (solanaAccount.metadata?.files)
+      image = solanaAccount.metadata?.files[0].uri || "";
   }
   return {
     pubkey: solanaAccount.pubkey,
@@ -395,7 +402,10 @@ export function convertToTokenAssets(json: any): AssetsToken[] {
         const item = json.items[i];
         if (item.id === null || !item.token_info) continue;
         if (item.token_info.decimals === 0) continue;
-        const pubkey = item.id;
+        let pubkey = item.id;
+        if (item.token_info?.associated_token_address) {
+          pubkey = item.token_info?.associated_token_address;
+        }
         const name = item.content?.metadata?.symbol || "";
         const balance = item.token_info?.price_info?.total_price || 0;
         const img = item.content.files[0].uri || "";
@@ -418,7 +428,10 @@ export async function convertToNFTAssets(json: any): Promise<AssetsNFT[]> {
       for (let i = 0; i < json.items.length; i++) {
         const item = json.items[i];
         if (item.id === null || item.interface !== "V1_NFT") continue;
-        const pubkey = item.id;
+        let pubkey = item.id;
+        if (item.token_info?.associated_token_address) {
+          pubkey = item.token_info?.associated_token_address;
+        }
         const name = item.content?.metadata?.name || "";
         const img = item.content?.files[0]?.uri || "";
         let mime = "image/png";

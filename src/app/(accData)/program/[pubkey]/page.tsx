@@ -60,19 +60,13 @@ export default function ProgramAccount() {
 
   return programData ? (
     <main className="flex flex-col xl:max-w-[1300px] 2xl:max-w-[1700px] mx-auto ">
-      <Title
-        title={
-          programData.executableData.length > 0
-            ? "PROGRAM"
-            : "PROGRAM EXECUTABLE DATA"
-        }
-      />
+      <Title title="PROGRAM" />
       <div className="w-full flex flex-col justify-center items-start my-5 bg-dark">
         <AccountDataGroup>
           <AccountDataRow>
             <AccountData pubkey={programData.pubkey} title="Program pubkey" />
             <AccountData
-              name={programData.balance.toString()}
+              name={programData.balance.toLocaleString()}
               title="Balance"
             />
             <AccountData name={programData.type} title="Account type" />

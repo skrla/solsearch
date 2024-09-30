@@ -45,7 +45,7 @@ export default function TokensPage() {
 
   return tokenData ? (
     <main className="flex flex-col xl:max-w-[1300px] 2xl:max-w-[1700px] mx-auto ">
-      <Title title={tokenData.type === "mint" ? "Token Mint" : "Token"} />
+      <Title title={"Token"} />
       <div className="w-full flex justify-center items-start">
         <MainInfo img={tokenData.img || ""} />
         <div className="w-full flex flex-col my-5 bg-dark">
@@ -53,18 +53,18 @@ export default function TokensPage() {
             <AccountDataRow>
               <AccountData pubkey={tokenData.pubkey} title="Token pubkey" />
               <AccountData name={tokenData.name} title="Name" />
-              <AccountData name={tokenData.type} title="Type" />
+              <AccountData name={tokenData.type.toUpperCase()} title="Type" />
             </AccountDataRow>
             <AccountDataRow>
               <AccountData pubkey={tokenData.mintAuth} title="Mint authority" />
               {tokenData.supply > 0 ? (
                 <AccountData
-                  name={tokenData.supply.toString()}
+                  name={tokenData.supply.toLocaleString()}
                   title="Supply"
                 />
               ) : (
                 <AccountData
-                  name={tokenData.balance.toString()}
+                  name={tokenData.balance.toLocaleString()}
                   title="Balance"
                 />
               )}
@@ -76,8 +76,8 @@ export default function TokensPage() {
             {tokenData.freezeAuth !== "" && (
               <AccountDataRow>
                 <AccountData
-                  pubkey={tokenData.mintAuth}
-                  title="Mint authority"
+                  pubkey={tokenData.freezeAuth}
+                  title="Freeze authority"
                 />
               </AccountDataRow>
             )}

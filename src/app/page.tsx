@@ -3,20 +3,17 @@
 import AccountDataRow from "@/components/accounts/AccountDataRow";
 import MainInfo from "@/components/accounts/MainInfo";
 import Title from "@/components/Title";
+import TokenChart from "@/components/TokenChart";
 
 export default function Home() {
   return (
     <main className="flex flex-col xl:max-w-[1400px] 2xl:max-w-[1800px] mx-auto">
-      <Title title="NFT" />
-      <div className="w-full flex justify-center items-start">
-        <MainInfo img="https://fx5qkqcitujirfqffn2hrt6672xb37t3n5olozdrknlqefsmzcha.arweave.net/LfsFQEidEoiWBSt0eM_e_q4d_ntvXLdkcVNXAhZMyI4" />
-        <div className="w-full flex flex-col my-5">
-          {/* <AccountDataRow />
-          <AccountDataRow />
-          <AccountDataRow />
-          <AccountDataRow /> */}
-        </div>
-      </div>
+      <Title title="SOLANA" />
+      <TokenChart
+        mintPubkey="So11111111111111111111111111111111111111112"
+        name="SOL"
+        decimals={9}
+      />
     </main>
   );
 }

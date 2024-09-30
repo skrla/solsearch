@@ -47,14 +47,12 @@ const SwiperData = ({ tokenAssets, nftAssets }: SliderProps) => {
         tokenAssets.length > 0 &&
         tokenAssets.map((token, index) => (
           <SwiperSlide key={token.pubkey}>
-            <div
-              className="flex flex-col gap-4 cursor-pointer"
-              onClick={() => onClick(`/token/${token.pubkey}`)}
-            >
+            <div className="flex flex-col gap-4">
               <img
                 src={token.img}
                 alt={`Slide ${index + 1}`}
-                className="max-w-28"
+                className="max-w-28 cursor-pointer"
+                onClick={() => onClick(`/token/${token.pubkey}`)}
               />
               <p>{token.name}</p>
               <p>{token.balance}</p>
@@ -65,18 +63,24 @@ const SwiperData = ({ tokenAssets, nftAssets }: SliderProps) => {
         nftAssets.length > 0 &&
         nftAssets.map((nft, index) => (
           <SwiperSlide key={nft.pubkey}>
-            <div
-              className="flex flex-col gap-4 cursor-pointer"
-              onClick={() => onClick(`/nft/${nft.pubkey}`)}
-            >
+            <div className="flex flex-col gap-4">
               {nft.mime.includes("image") ? (
                 <img
                   src={nft.img}
                   alt={`Slide ${index + 1}`}
-                  className="max-w-96"
+                  className="max-w-96  cursor-pointer"
+                  onClick={() => onClick(`/nft/${nft.pubkey}`)}
                 />
               ) : (
-                <video width="384" autoPlay loop muted playsInline>
+                <video
+                  width="384"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  onClick={() => onClick(`/nft/${nft.pubkey}`)}
+                  className="cursor-pointer"
+                >
                   <source src={nft.img} type="video/mp4" />
                 </video>
               )}

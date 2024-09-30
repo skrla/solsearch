@@ -1,10 +1,11 @@
 "use client";
-import Input from "../../components/Input";
+import Input from "../Input";
 import { useConnection } from "@solana/wallet-adapter-react";
-import { useSolanaAccount } from "../../components/contexts/SolanaAccountContext";
+import { useSolanaAccount } from "../contexts/SolanaAccountContext";
 import { getAccountInfo } from "@/backend/accountData";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function Header() {
   const { connection } = useConnection();
@@ -17,6 +18,7 @@ export default function Header() {
         commitment: "finalized",
         maxSupportedTransactionVersion: 0,
       });
+      router.push(`/transaction/${pubkey}`);
       return;
     }
     const accountData = await getAccountInfo(connection, pubkey);
@@ -44,6 +46,14 @@ export default function Header() {
         return;
       }
       if (
+        solanaAccount.data.parsed.info &&
+        solanaAccount.data.parsed.info.tokenAmount &&
+        solanaAccount.data.parsed.info.tokenAmount.decimals === 0
+      ) {
+        router.push(`/nft/${solanaAccount.pubkey}`);
+        return;
+      }
+      if (
         solanaAccount.data &&
         solanaAccount.data.parsed &&
         solanaAccount.data.parsed.infoMint &&
@@ -57,16 +67,25 @@ export default function Header() {
           router.push(`/token/${solanaAccount.pubkey}`);
           return;
         }
-      } else {
-        router.push(`/token/${solanaAccount.pubkey}`);
-        return;
       }
+
+      router.push(`/token/${solanaAccount.pubkey}`);
+      return;
     }
   }, [solanaAccount?.pubkey]);
 
   return (
-    <header className="flex text-white bg-fuchsia-900 items-center justify-between p-6">
-      <h1 className="text-2xl font-bold font-serif">SOL SEARCHER</h1>
+    <header className="flex text-white bg-darker items-center justify-between p-4 border-b border-border">
+      <div>
+        <a href="/">
+          <Image
+            width={236}
+            height={50}
+            src="/images/solsearchLogo.svg"
+            alt="Solsearch Logo"
+          />
+        </a>
+      </div>
 
       <Input onClick={onClick} />
     </header>
