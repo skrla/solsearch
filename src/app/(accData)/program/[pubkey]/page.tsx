@@ -101,7 +101,7 @@ export default function ProgramAccount() {
                   onClick={downloadData}
                 >
                   <p>{programData.sizeInKb} Kb</p>
-                  <RiFileDownloadLine className="h-[14px] w-[14px]" />
+                  <RiFileDownloadLine size={14} />
                 </div>
               </div>
             )}

@@ -1,7 +1,12 @@
 "use client";
 import { getAccountData, getFullAccountData } from "@/backend/accountData";
 import { convertToTokenPageType } from "@/backend/converters";
+import AccountData from "@/components/accounts/AccountData";
+import AccountDataGroup from "@/components/accounts/AccountDataGroup";
+import AccountDataRow from "@/components/accounts/AccountDataRow";
+import MainInfo from "@/components/accounts/MainInfo";
 import { useSolanaAccount } from "@/components/contexts/SolanaAccountContext";
+import Title from "@/components/Title";
 import TokenChart from "@/components/TokenChart";
 import { TokenPageType } from "@/types/pagetypes";
 import { useConnection } from "@solana/wallet-adapter-react";
@@ -38,44 +43,63 @@ export default function TokensPage() {
     getData();
   }, []);
 
-  return (
-    <>
-      {tokenData ? (
-        <div className="flex flex-col p-5 items-center">
-          <div className="flex p-2 items-center justify-start">
-            <img src="" alt="token icon" />
-            <h2>{tokenData.name}</h2>
-            <h3>ADRESA TOKENA</h3>
-          </div>
-          <div className="flex p-2 items-center justify-between">
-            <p>Trenutni supply</p>
-            <p>{tokenData.supply}</p>
-          </div>
-          <div className="flex p-2 items-center justify-between">
-            <p>TOKEN EXT</p>
-            <p>{tokenData.tokenExt}</p>
-          </div>
-          <div className="flex p-2 items-center justify-between">
-            <p>TOKEN OWNER</p>
-            <p>{tokenData.owner}</p>
-          </div>
-          <div className="flex p-2 items-center justify-between">
-            <p>MINT AUTHORITY</p>
-            <p>{tokenData.mintAuth}</p>
-          </div>
-          <div className="flex p-2 items-center justify-between">
-            <p>FREZZE AUTHORITY</p>
-            <p>{tokenData.freezeAuth}</p>
-          </div>
+  return tokenData ? (
+    <main className="flex flex-col xl:max-w-[1300px] 2xl:max-w-[1700px] mx-auto ">
+      <Title title={solanaAccount?.data === null ? "cNFT" : "NFT"} />
+      <div className="w-full flex justify-center items-start">
+        <MainInfo img={tokenData.img || ""} />
+        <div className="w-full flex flex-col my-5 bg-dark">
+          <AccountDataGroup>
+            <AccountDataRow>
+              <AccountData pubkey={tokenData.pubkey} title="Token pubkey" />
+              <AccountData name={tokenData.name} title="Name" />
+              <AccountData name={tokenData.type} title="Type" />
+            </AccountDataRow>
+            <AccountDataRow>
+              <AccountData pubkey={tokenData.mintAuth} title="Mint authority" />
+              {tokenData.supply > 0 ? (
+                <AccountData
+                  name={tokenData.supply.toString()}
+                  title="Supply"
+                />
+              ) : (
+                <AccountData
+                  name={tokenData.balance.toString()}
+                  title="Balance"
+                />
+              )}
+              <AccountData
+                boolean={tokenData.tokenExt}
+                title="Token extensions"
+              />
+            </AccountDataRow>
+            {tokenData.freezeAuth !== "" && (
+              <AccountDataRow>
+                <AccountData
+                  pubkey={tokenData.mintAuth}
+                  title="Mint authority"
+                />
+              </AccountDataRow>
+            )}
+            <AccountDataRow>
+              <AccountData pubkey={tokenData.owner} title="Owner" />
+            </AccountDataRow>
+          </AccountDataGroup>
         </div>
-      ) : null}
-      {tokenData?.pubkey && (
+      </div>
+      {tokenData.type === "Mint" ? (
         <TokenChart
           mintPubkey={tokenData.pubkey}
           name={tokenData.name}
           decimals={tokenData.decimals}
         />
+      ) : (
+        <TokenChart
+          mintPubkey={tokenData.mintAuth}
+          name={tokenData.name}
+          decimals={tokenData.decimals}
+        />
       )}
-    </>
-  );
+    </main>
+  ) : null;
 }

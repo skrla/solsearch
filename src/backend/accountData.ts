@@ -263,6 +263,52 @@ async function getProgramUpgradeAuth(connection: Connection, pubkey: string) {
   }
 }
 
+async function getAssetsByOwner(conncetion: Connection, pubkey: string) {
+  const response = await fetch(conncetion.rpcEndpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      jsonrpc: "2.0",
+      id: "my-id",
+      method: "getAssetsByOwner",
+      params: {
+        ownerAddress: pubkey,
+        page: 1,
+        limit: 1000,
+        displayOptions: {
+          showFungible: true,
+        },
+      },
+    }),
+  });
+  const { result } = await response.json();
+  console.log("Assets by Owner: ", result.items);
+}
+
+async function getCollectionData(conncetion: Connection, pubkey: string) {
+  const response = await fetch(conncetion.rpcEndpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      jsonrpc: "2.0",
+      id: "my-id",
+      method: "getAssetsByGroup",
+      params: {
+        groupKey: "collection",
+        groupValue: pubkey,
+        page: 1,
+        limit: 1000,
+      },
+    }),
+  });
+  const { result } = await response.json();
+  console.log("Assets by Group: ", result.items);
+}
+
 //TODO: Remove delay, temporary here because of Helius 10 requests per second limit
 const delay = (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms));

@@ -2,6 +2,9 @@
 
 import { getAccountData, getFullAccountData } from "@/backend/accountData";
 import { convertToAccountPageType } from "@/backend/converters";
+import AccountData from "@/components/accounts/AccountData";
+import AccountDataGroup from "@/components/accounts/AccountDataGroup";
+import AccountDataRow from "@/components/accounts/AccountDataRow";
 import { useSolanaAccount } from "@/components/contexts/SolanaAccountContext";
 import { AccountPageType } from "@/types/pagetypes";
 import { useConnection } from "@solana/wallet-adapter-react";
@@ -39,23 +42,23 @@ export default function AccountInfo() {
   }, []);
 
   return accountData ? (
-    <div className="flex flex-col p-5 items-center">
-      <div className="flex p-2 items-center justify-start">
-        <h2>{accountData.pubkey}</h2>
-        <h3>ACCOUNT INFO</h3>
-      </div>
-      <div className="flex p-2 items-center justify-between">
-        <p>SOL stanje</p>
-        <p>{accountData.balance}</p>
-      </div>
-      <div className="flex p-2 items-center justify-between">
-        <p>IZVRŠIV</p>
-        <p>{accountData.executable}</p>
-      </div>
-      <div className="flex p-2 items-center justify-between">
-        <p>Owner</p>
-        <p>{accountData.owner}</p>
-      </div>
-    </div>
+    <AccountDataGroup>
+      <AccountDataRow>
+        <AccountData pubkey={accountData.pubkey} title="Pubkey" />
+      </AccountDataRow>
+      <AccountDataRow>
+        <AccountData name={accountData.balance.toString()} title="Balance" />
+      </AccountDataRow>
+      <AccountDataRow>
+        <AccountData pubkey={accountData.owner} title="Owner pubkey" />
+      </AccountDataRow>
+      <AccountDataRow>
+        <AccountData boolean={accountData.executable} title="Executable" />
+      </AccountDataRow>
+      <AccountDataRow>
+        <AccountData name="Account" title="Type" />
+      </AccountDataRow>
+    </AccountDataGroup>
   ) : null;
+
 }
