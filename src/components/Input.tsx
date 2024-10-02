@@ -10,7 +10,12 @@ type InputTypeProps = {
 export default function Input({ onClick }: InputTypeProps) {
   const [key, setKey] = useState<string>("");
   return (
-    <div className="relative flex w-full lg:w-[950px] items-center">
+    <div
+      className="relative flex w-full lg:w-[950px] items-center"
+      onKeyDown={(e) => {
+        if (e.key === "Enter") onClick(key);
+      }}
+    >
       <input
         placeholder="Write public key or transaction to search:"
         accessKey="s"
@@ -25,7 +30,6 @@ export default function Input({ onClick }: InputTypeProps) {
         alt="Search icon"
         className="absolute right-5 h-10 w-10 cursor-pointer"
         onClick={() => onClick(key)}
-        accessKey="enter"
       />
     </div>
   );

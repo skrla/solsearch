@@ -396,8 +396,8 @@ export function convertToTokenPageType(
 
 export function convertToTokenAssets(json: any): AssetsToken[] {
   let tokenAssets: AssetsToken[] = [];
-  if (json !== null) {
-    if (json.items !== null && json.items.length > 0) {
+  if (json && json !== null) {
+    if (json.items && json.items !== null && json.items.length > 0) {
       for (let i = 0; i < json.items.length; i++) {
         const item = json.items[i];
         if (item.id === null || !item.token_info) continue;
@@ -423,8 +423,8 @@ export function convertToTokenAssets(json: any): AssetsToken[] {
 
 export async function convertToNFTAssets(json: any): Promise<AssetsNFT[]> {
   let tokenAssets: AssetsNFT[] = [];
-  if (json !== null) {
-    if (json.items !== null && json.items.length > 0) {
+  if (json && json !== null) {
+    if (json.items && json.items !== null && json.items.length > 0) {
       for (let i = 0; i < json.items.length; i++) {
         const item = json.items[i];
         if (item.id === null || item.interface !== "V1_NFT") continue;

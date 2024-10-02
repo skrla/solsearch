@@ -14,6 +14,7 @@ import {
 } from "chart.js";
 import { TokenGraphType } from "@/types/pagetypes";
 import { graphDataToken } from "@/backend/graphData";
+import { color } from "chart.js/helpers";
 
 Chart.register(
   CategoryScale,
@@ -77,10 +78,14 @@ const TokenChart = ({ mintPubkey, name, decimals }: TokenChartProps) => {
     plugins: {
       legend: {
         position: "top" as const,
+        labels: {
+          color: "white",
+        },
       },
       title: {
         display: true,
         text: `${name} Price `,
+        color: "white",
       },
       tooltip: {
         callbacks: {
@@ -95,16 +100,22 @@ const TokenChart = ({ mintPubkey, name, decimals }: TokenChartProps) => {
       y: {
         type: "linear",
         ticks: {
+          color: "white",
           callback: function (value: string | number) {
             return typeof value === "number" ? value.toFixed(decimals) : value;
           },
+        },
+      },
+      x: {
+        ticks: {
+          color: "white",
         },
       },
     },
   };
 
   return (
-    <div className="flex w-full h-[600px] p-5 items-center justify-center xl:max-w-[1000px] 2xl:max-w-[1400px] mx-auto bg-dark ">
+    <div className="flex w-full h-[600px] p-5 items-center justify-center xl:max-w-[1000px] 2xl:max-w-[1400px] mx-auto bg-dark text-white">
       {chartData ? (
         <Line data={chartData} options={options} />
       ) : (

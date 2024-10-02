@@ -3,7 +3,16 @@ import AppWalletProvider from "../components/contexts/AppWalletProvider";
 import Header from "../components/common/header";
 import Footer from "../components/common/Footer";
 import { SolanaAccountProvider } from "../components/contexts/SolanaAccountContext";
-import Head from "next/head";
+import { Metadata } from "next";
+import { Lato } from "next/font/google";
+
+export const metadata: Metadata = {
+  title: "SolSearch",
+  description: "Search solana blockchain",
+  applicationName: "SolSearch",
+};
+
+const lato = Lato({ weight: "400", subsets: ["latin"] });
 
 export default function RootLayout({
   children,
@@ -12,17 +21,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <Head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap"
-          rel="stylesheet"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap"
-          rel="stylesheet"
-        />
-      </Head>
-      <body>
+      <body
+        className={`${lato.className} bg-darker min-h-screen m-0 relative after:block after:content-none after:h-16`}
+      >
         <AppWalletProvider>
           <SolanaAccountProvider>
             <Header />
@@ -34,4 +35,3 @@ export default function RootLayout({
     </html>
   );
 }
-``;

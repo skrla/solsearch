@@ -1,7 +1,5 @@
 "use client";
 
-import AccountDataRow from "@/components/accounts/AccountDataRow";
-import MainInfo from "@/components/accounts/MainInfo";
 import Title from "@/components/Title";
 import TokenChart from "@/components/TokenChart";
 

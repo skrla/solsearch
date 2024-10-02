@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  delay,
   getAccountData,
   getAssetsByOwner,
   getFullAccountData,
@@ -9,12 +10,12 @@ import { convertToAccountPageType } from "@/backend/converters";
 import AccountData from "@/components/accounts/AccountData";
 import AccountDataGroup from "@/components/accounts/AccountDataGroup";
 import AccountDataRow from "@/components/accounts/AccountDataRow";
-import MainInfo from "@/components/accounts/MainInfo";
 import { useSolanaAccount } from "@/components/contexts/SolanaAccountContext";
 import SwiperData from "@/components/SwiperData";
 import Title from "@/components/Title";
 import { AccountAssets, AccountPageType } from "@/types/pagetypes";
 import { useConnection } from "@solana/wallet-adapter-react";
+import { PublicKey } from "@solana/web3.js";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -24,6 +25,23 @@ export default function AccountInfo() {
 
   const { connection } = useConnection();
   const params = useParams();
+
+  async function getTransactions(publicKey: PublicKey) {
+    const transactions = await connection.getSignaturesForAddress(publicKey, {
+      limit: 10,
+    });
+    const signatures = transactions.map((t) => {
+      return t.signature;
+    });
+    console.log(JSON.stringify(transactions));
+    await delay(2000);
+    signatures.forEach(async (s) => {
+      const tx = await connection.getParsedTransaction(s);
+      console.log(JSON.stringify(tx));
+    });
+
+    return transactions;
+  }
 
   useEffect(() => {
     async function getData() {
@@ -51,6 +69,7 @@ export default function AccountInfo() {
           ...prev!,
           assets,
         }));
+        getTransactions(new PublicKey(fullSolanaAccount.pubkey));
       }
     }
     getData();

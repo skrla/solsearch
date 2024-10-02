@@ -3,7 +3,7 @@ import { FaGithub, FaDiscord, FaLinkedin } from "react-icons/fa";
 
 export default function Footer() {
   return (
-    <footer className="flex items-center justify-between p-5 border-t border-border">
+    <footer className="absolute flex items-center bottom-0 w-full justify-between p-5 border-t border-border">
       <a href="/">
         <Image
           width={140}
