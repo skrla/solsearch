@@ -7,6 +7,7 @@ import {
   getFullAccountData,
 } from "@/backend/accountData";
 import { convertToAccountPageType } from "@/backend/converters";
+import { convertToTransactionType } from "@/backend/transactionConverter";
 import AccountData from "@/components/accounts/AccountData";
 import AccountDataGroup from "@/components/accounts/AccountDataGroup";
 import AccountDataRow from "@/components/accounts/AccountDataRow";
@@ -36,10 +37,12 @@ export default function AccountInfo() {
     console.log(JSON.stringify(transactions));
     await delay(2000);
     const tx = await connection.getParsedTransaction(
-      "3fE2zZUL64g1ui5yzqpppPxuJhrC9A5Hq4rfSTx9jzWncG8g7LVwYjFi9bHo8s71QmbMhDTqLhYStQhJQ8cRHaFN",
+      "9sJLimtKf54YozTBcW6p4Lf3h9GrhRzG1pQq3NKh4KLm9WhkNU4pU3k1A7LjPeGWJmbH4YgSqA3WWb3hWDZycxX",
       { maxSupportedTransactionVersion: 0 }
     );
-    console.log(JSON.stringify(tx));
+    const converterTx = convertToTransactionType(tx);
+
+    console.log(JSON.stringify(converterTx));
     // signatures.forEach(async (s) => {
     //   await delay(500);
     //   const tx = await connection.getParsedTransaction(s);

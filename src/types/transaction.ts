@@ -1,11 +1,11 @@
 import { TokenAmount } from "@solana/web3.js";
 
 export type TransactionType = {
-  blockTime: number;
+  blockTime: number | null;
   slot: number;
   version: number;
-  transaction: TransactionDataType;
-  meta: TransactionMetaType;
+  transaction: TransactionDataType | null;
+  meta: TransactionMetaType | null;
 };
 
 export type TransactionDataType = {
@@ -40,7 +40,7 @@ export type InstructionTransactionType = {
   program: string | undefined;
   programId: string;
   stackHeight: number | null;
-  innerInstructions: InnerInstructionType;
+  innerInstructions: InnerInstructionType[];
 };
 
 export type ParsedTransactionType = {
@@ -74,7 +74,7 @@ export type TransactionMetaType = {
   postBalances: number[];
   preBalances: number[];
   rewards: any[]; //TODO: see rewards inside transactions
-  innerInstructions: InnerInstructionType;
+  innerInstructions: InnerInstructionType[];
   preTokenBalances: TokenBalancesType[];
   postTokenBalances: TokenBalancesType[];
 };

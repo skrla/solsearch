@@ -124,6 +124,7 @@ export const getFullAccountData = async (
         rentEpoch: null,
         space: null,
         pubkey: pubkey,
+        transactions: null,
       };
     }
   }
@@ -155,6 +156,7 @@ export const getAccountInfo = async (
       space: null,
       programData: null,
       pubkey: pubkey,
+      transactions: null,
     };
   }
 
