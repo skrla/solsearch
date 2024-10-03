@@ -28,11 +28,11 @@ export default function AppWalletProvider({
   const network = WalletAdapterNetwork.Devnet;
   const apiKey = process.env.NEXT_PUBLIC_HELIUS_API_KEY;
 
-  // const endpoint = useMemo(() => clusterApiUrl(network), [network]);
-  const endpoint = useMemo(
-    () => "https://mainnet.helius-rpc.com/?api-key=" + apiKey,
-    [apiKey]
-  );
+  const endpoint = useMemo(() => clusterApiUrl(network), [network]);
+  // const endpoint = useMemo(
+  //   () => "https://mainnet.helius-rpc.com/?api-key=" + apiKey,
+  //   [apiKey]
+  // );
   const wallets = useMemo(() => [new PhantomWalletAdapter()], [network]);
 
   return (

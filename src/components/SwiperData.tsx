@@ -47,7 +47,7 @@ const SwiperData = ({ tokenAssets, nftAssets }: SliderProps) => {
         tokenAssets.length > 0 &&
         tokenAssets.map((token, index) => (
           <SwiperSlide key={token.pubkey}>
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 text-white">
               <img
                 src={token.img}
                 alt={`Slide ${index + 1}`}
@@ -63,7 +63,7 @@ const SwiperData = ({ tokenAssets, nftAssets }: SliderProps) => {
         nftAssets.length > 0 &&
         nftAssets.map((nft, index) => (
           <SwiperSlide key={nft.pubkey}>
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 text-white">
               {nft.mime.includes("image") ? (
                 <img
                   src={nft.img}

@@ -51,6 +51,7 @@ export function convertToSolanaAccountType(
         space: value.space,
         data: dataAccount,
         metadata: null,
+        transactions: null,
       };
 
       return solanaAccount;
@@ -152,6 +153,7 @@ export function convertToSolanaAccountType(
     space: value.space,
     data: dataAccount,
     metadata: null,
+    transactions: null,
   };
 
   return solanaAccount;

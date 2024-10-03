@@ -35,16 +35,23 @@ export default function AccountInfo() {
     });
     console.log(JSON.stringify(transactions));
     await delay(2000);
-    signatures.forEach(async (s) => {
-      const tx = await connection.getParsedTransaction(s);
-      console.log(JSON.stringify(tx));
-    });
+    const tx = await connection.getParsedTransaction(
+      "3fE2zZUL64g1ui5yzqpppPxuJhrC9A5Hq4rfSTx9jzWncG8g7LVwYjFi9bHo8s71QmbMhDTqLhYStQhJQ8cRHaFN",
+      { maxSupportedTransactionVersion: 0 }
+    );
+    console.log(JSON.stringify(tx));
+    // signatures.forEach(async (s) => {
+    //   await delay(500);
+    //   const tx = await connection.getParsedTransaction(s);
+    //   console.log(JSON.stringify(tx));
+    // });
 
     return transactions;
   }
 
   useEffect(() => {
     async function getData() {
+      await delay(5000);
       let fullSolanaAccount;
       if (solanaAccount) {
         fullSolanaAccount = await getAccountData(

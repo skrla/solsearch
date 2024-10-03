@@ -40,6 +40,7 @@ export type InstructionTransactionType = {
   program: string | undefined;
   programId: string;
   stackHeight: number | null;
+  innerInstructions: InnerInstructionType;
 };
 
 export type ParsedTransactionType = {

@@ -11,6 +11,7 @@ export type SolanaAccount = {
   data: DataAccount | null;
   metadata: MetaDataAccount | null;
   programData: ProgramData | null;
+  transactions: null
 };
 
 export type DataAccount = {
@@ -75,3 +76,10 @@ export type TransferFee = {
   maximumFee: number;
   transferFeeBasisPoints: number;
 };
+
+export type Transactions = {
+  fee: number;
+  lamports: number;
+  instructions: string[];
+  accountsPubkey: string[];
+}
