@@ -5,6 +5,7 @@ import {
   getAccountData,
   getAssetsByOwner,
   getFullAccountData,
+  getTransactions,
 } from "@/backend/accountData";
 import { convertToAccountPageType } from "@/backend/converters";
 import { convertToTransactionType } from "@/backend/transactionConverter";
@@ -14,7 +15,9 @@ import AccountDataRow from "@/components/accounts/AccountDataRow";
 import { useSolanaAccount } from "@/components/contexts/SolanaAccountContext";
 import SwiperData from "@/components/SwiperData";
 import Title from "@/components/Title";
+import TransactionTable from "@/components/TransactionTable";
 import { AccountAssets, AccountPageType } from "@/types/pagetypes";
+import { TransactionType } from "@/types/transaction";
 import { useConnection } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
 import { useParams } from "next/navigation";
@@ -23,38 +26,13 @@ import { useEffect, useState } from "react";
 export default function AccountInfo() {
   const { solanaAccount, setSolanaAccount } = useSolanaAccount();
   const [accountData, setAccountData] = useState<AccountPageType>();
+  const [transactions, setTransactions] = useState<TransactionType[]>([]);
 
   const { connection } = useConnection();
   const params = useParams();
 
-  async function getTransactions(publicKey: PublicKey) {
-    const transactions = await connection.getSignaturesForAddress(publicKey, {
-      limit: 10,
-    });
-    const signatures = transactions.map((t) => {
-      return t.signature;
-    });
-    console.log(JSON.stringify(transactions));
-    await delay(2000);
-    const tx = await connection.getParsedTransaction(
-      "9sJLimtKf54YozTBcW6p4Lf3h9GrhRzG1pQq3NKh4KLm9WhkNU4pU3k1A7LjPeGWJmbH4YgSqA3WWb3hWDZycxX",
-      { maxSupportedTransactionVersion: 0 }
-    );
-    const converterTx = convertToTransactionType(tx);
-
-    console.log(JSON.stringify(converterTx));
-    // signatures.forEach(async (s) => {
-    //   await delay(500);
-    //   const tx = await connection.getParsedTransaction(s);
-    //   console.log(JSON.stringify(tx));
-    // });
-
-    return transactions;
-  }
-
   useEffect(() => {
     async function getData() {
-      await delay(5000);
       let fullSolanaAccount;
       if (solanaAccount) {
         fullSolanaAccount = await getAccountData(
@@ -79,7 +57,17 @@ export default function AccountInfo() {
           ...prev!,
           assets,
         }));
-        getTransactions(new PublicKey(fullSolanaAccount.pubkey));
+        const convTrans = await getTransactions(
+          connection,
+          new PublicKey(fullSolanaAccount.pubkey)
+        );
+        const newTransactions: TransactionType[] = [...transactions];
+        convTrans.forEach((t) => {
+          newTransactions.push(t);
+        });
+        console.log(JSON.stringify(convTrans));
+
+        setTransactions(newTransactions);
       }
     }
     getData();
@@ -125,6 +113,9 @@ export default function AccountInfo() {
           )}
         </>
       )}
+      {transactions.length > 0 ? (
+        <TransactionTable transactions={transactions} />
+      ) : null}
     </main>
   ) : null;
 }

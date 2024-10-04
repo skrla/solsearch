@@ -1,4 +1,5 @@
 import { NFTAttribute, NFTCreator, NFTOwnership } from "./metadata";
+import { TransactionType } from "./transaction";
 
 export type NftPageType = {
   name: string;

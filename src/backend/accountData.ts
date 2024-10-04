@@ -8,6 +8,8 @@ import {
 } from "./converters";
 import { MetaDataAccount } from "../types/metadata";
 import { AccountAssets, AssetsNFT, AssetsToken } from "@/types/pagetypes";
+import { convertToTransactionType } from "./transactionConverter";
+import { TransactionType } from "@/types/transaction";
 
 export const BPF_LOADER_UPGRADE_PROGRAM_ID =
   "BPFLoaderUpgradeab1e11111111111111111111111";
@@ -321,6 +323,39 @@ export async function getCollectionData(
   const { result } = await response.json();
   const nftAssets: AssetsNFT[] = await convertToNFTAssets(result);
   return nftAssets || [];
+}
+
+export async function getTransactions(
+  connection: Connection,
+  publicKey: PublicKey
+): Promise<TransactionType[]> {
+  const transactions: TransactionType[] = [];
+
+  const signature = await connection.getSignaturesForAddress(publicKey, {
+    limit: 10,
+  });
+  const signatures = signature.map((t) => {
+    return t.signature;
+  });
+
+  const promise = signatures.map(async (s) => {
+    await delay(1000);
+    const tx = await connection.getParsedTransaction(s, {
+      maxSupportedTransactionVersion: 0,
+    });
+    console.log(JSON.stringify(tx));
+    const convTx = convertToTransactionType(tx);
+    console.log(JSON.stringify(convTx));
+
+    if (convTx) {
+      transactions.push(convTx);
+    }
+    return convTx;
+  });
+  await Promise.all(promise);
+  console.log(JSON.stringify(transactions));
+
+  return transactions;
 }
 
 //TODO: Remove delay, temporary here because of Helius 10 requests per second limit

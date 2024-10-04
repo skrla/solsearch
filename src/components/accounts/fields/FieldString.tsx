@@ -4,13 +4,16 @@ import Image from "next/image";
 import React, { useState } from "react";
 
 const FieldString = ({ name, pubkey }: { name: string; pubkey?: boolean }) => {
-  const [copy, setCopy] = useState("/images/copyGardien.svg");
+  const [copy, setCopy] = useState(true);
+  const copyUrl = "/images/copyGardien.svg";
+  const check = "/images/check.svg";
+
   const handleCopy = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      setCopy("/images/check.svg");
+      setCopy(false);
       await delay(1000);
-      setCopy("/images/copyGardien.svg");
+      setCopy(true);
     } catch {
       console.error("Failed to copy: ", text);
     }
@@ -21,7 +24,11 @@ const FieldString = ({ name, pubkey }: { name: string; pubkey?: boolean }) => {
       onClick={() => handleCopy(name)}
     >
       <p>{name}</p>
-      <Image src={copy} alt="Copy icon" height={14} width={14} />
+      {copy ? (
+        <Image src={copyUrl} alt="Copy icon" height={14} width={14} />
+      ) : (
+        <Image src={check} alt="Check" height={14} width={14} />
+      )}
     </div>
   ) : (
     <p className="flex w-full text-white text-sm">{name}</p>

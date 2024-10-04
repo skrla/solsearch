@@ -1,7 +1,6 @@
 "use client";
 import Image from "next/image";
 import { useState } from "react";
-import { MdScreenSearchDesktop } from "react-icons/md";
 
 type InputTypeProps = {
   onClick: (pubkey: string) => void;
