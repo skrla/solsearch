@@ -149,7 +149,6 @@ export function convertToTransactionType(
 
     if (rawData.meta && rawData.meta !== null) {
       const rawMeta = rawData.meta;
-      console.log(JSON.stringify(rawMeta.preTokenBalances));
       const fee = rawMeta.fee || 0;
       const slot = rawMeta.slot || 0;
       const err = rawMeta.err || null;
