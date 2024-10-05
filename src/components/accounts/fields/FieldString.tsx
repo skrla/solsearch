@@ -23,7 +23,7 @@ const FieldString = ({ name, pubkey }: { name: string; pubkey?: boolean }) => {
       className="flex w-full text-white text-sm gap-2 cursor-pointer"
       onClick={() => handleCopy(name)}
     >
-      <p>{name}</p>
+      <p>{name.substring(0, 25) + "..."}</p>
       {copy ? (
         <Image src={copyUrl} alt="Copy icon" height={14} width={14} />
       ) : (

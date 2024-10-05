@@ -272,11 +272,7 @@ export function convertToAccountPageType(
       ? solanaAccount.lamports / LAMPORTS_PER_SOL
       : 0;
 
-  const ownerPubkey =
-    solanaAccount.owner?.toString() === SystemProgram.programId.toString()
-      ? "System Program"
-      : solanaAccount.owner?.toString();
-
+  const ownerPubkey = solanaAccount.owner?.toString() || "";
   return {
     pubkey: solanaAccount.pubkey.toString(),
     balance: balance,

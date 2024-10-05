@@ -3,7 +3,7 @@ import { TokenAmount } from "@solana/web3.js";
 export type TransactionType = {
   blockTime: number | null;
   slot: number;
-  version: number;
+  version: number | string;
   transaction: TransactionDataType | null;
   meta: TransactionMetaType | null;
 };
@@ -89,5 +89,5 @@ export type TokenBalancesType = {
   mint: string;
   owner: string;
   programId: string;
-  tokenAmount: TokenAmount;
+  uiTokenAmount: TokenAmount;
 };

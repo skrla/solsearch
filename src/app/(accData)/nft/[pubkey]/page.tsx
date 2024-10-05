@@ -14,10 +14,14 @@ import {
   getAccountData,
   getCollectionData,
   getFullAccountData,
+  getTransactions,
 } from "@/backend/accountData";
 import { useConnection } from "@solana/wallet-adapter-react";
 import { useParams } from "next/navigation";
 import SwiperData from "@/components/SwiperData";
+import { TransactionType } from "@/types/transaction";
+import { PublicKey } from "@solana/web3.js";
+import TransactionTable from "@/components/TransactionTable";
 
 export default function NFTPage() {
   const { solanaAccount, setSolanaAccount } = useSolanaAccount();
@@ -27,6 +31,7 @@ export default function NFTPage() {
   const [chunkedAttributes, setChunkedAttributes] = useState<NFTAttribute[][]>(
     []
   );
+  const [transactions, setTransactions] = useState<TransactionType[]>([]);
 
   const [collection, setCollection] = useState<AssetsNFT[]>([]);
 
@@ -39,6 +44,50 @@ export default function NFTPage() {
       setChunkedAttributes(newChunkedAttributes);
     }
   };
+
+  async function fetchTransactions(pubkey?: string) {
+    let beforeSignature;
+    if (transactions.length > 0) {
+      const lastTransaction = transactions.at(-1);
+      if (lastTransaction) {
+        beforeSignature = lastTransaction.transaction?.signatures[0];
+      }
+    }
+    if (nftData) {
+      const convTrans = await getTransactions(
+        connection,
+        new PublicKey(nftData.pubkey),
+        beforeSignature
+      );
+
+      const newTransactions: TransactionType[] = [...transactions];
+      convTrans
+        .sort((t, tx) => {
+          return (tx.blockTime || 0) - (t.blockTime || 0);
+        })
+        .forEach((t) => {
+          newTransactions.push(t);
+        });
+      setTransactions(newTransactions);
+    }
+    if (pubkey) {
+      const convTrans = await getTransactions(
+        connection,
+        new PublicKey(pubkey),
+        beforeSignature
+      );
+
+      const newTransactions: TransactionType[] = [...transactions];
+      convTrans
+        .sort((t, tx) => {
+          return (tx.blockTime || 0) - (t.blockTime || 0);
+        })
+        .forEach((t) => {
+          newTransactions.push(t);
+        });
+      setTransactions(newTransactions);
+    }
+  }
 
   useEffect(() => {
     async function getData() {
@@ -70,6 +119,7 @@ export default function NFTPage() {
           );
           setCollection(coll);
         }
+        await fetchTransactions(fullSolanaAccount.pubkey.toString());
       }
     }
     getData();
@@ -168,6 +218,12 @@ export default function NFTPage() {
           </div>
         )}
       </div>
+      {transactions.length > 0 ? (
+        <TransactionTable
+          transactions={transactions}
+          fetchTransactions={fetchTransactions}
+        />
+      ) : null}
     </main>
   ) : null;
 }

@@ -149,6 +149,7 @@ export function convertToTransactionType(
 
     if (rawData.meta && rawData.meta !== null) {
       const rawMeta = rawData.meta;
+      console.log(JSON.stringify(rawMeta.preTokenBalances));
       const fee = rawMeta.fee || 0;
       const slot = rawMeta.slot || 0;
       const err = rawMeta.err || null;
@@ -159,9 +160,9 @@ export function convertToTransactionType(
       const rewards = rawMeta.rewards || [];
       const preTokenBalances = rawMeta.preTokenBalances || [];
       const postTokenBalances = rawMeta.postTokenBalances || [];
-      if (rawMeta.innerInstructions && rawMeta.innerInstructions.length > 0) {
-        const innerInstructions: InnerInstructionType[] = [];
+      const innerInstructions: InnerInstructionType[] = [];
 
+      if (rawMeta.innerInstructions && rawMeta.innerInstructions.length > 0) {
         rawMeta.innerInstructions.forEach((innerInstruction: any) => {
           const index = innerInstruction.index || 0;
           const instructions: InstructionTransactionType[] = [];
@@ -225,6 +226,7 @@ export function convertToTransactionType(
                 };
               }
             }
+
             instructions.push({
               stackHeight,
               programId,
@@ -246,20 +248,20 @@ export function convertToTransactionType(
             instructions,
           });
         });
-        meta = {
-          fee,
-          slot,
-          err,
-          computeUnitsConsumed,
-          logMessages,
-          postBalances,
-          preBalances,
-          rewards,
-          preTokenBalances,
-          postTokenBalances,
-          innerInstructions,
-        };
       }
+      meta = {
+        fee,
+        slot,
+        err,
+        computeUnitsConsumed,
+        logMessages,
+        postBalances,
+        preBalances,
+        rewards,
+        preTokenBalances,
+        postTokenBalances,
+        innerInstructions,
+      };
     }
   }
   return {

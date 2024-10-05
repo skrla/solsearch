@@ -8,7 +8,6 @@ import {
   getTransactions,
 } from "@/backend/accountData";
 import { convertToAccountPageType } from "@/backend/converters";
-import { convertToTransactionType } from "@/backend/transactionConverter";
 import AccountData from "@/components/accounts/AccountData";
 import AccountDataGroup from "@/components/accounts/AccountDataGroup";
 import AccountDataRow from "@/components/accounts/AccountDataRow";
@@ -30,6 +29,50 @@ export default function AccountInfo() {
 
   const { connection } = useConnection();
   const params = useParams();
+
+  async function fetchTransactions(pubkey?: string) {
+    let beforeSignature;
+    if (transactions.length > 0) {
+      const lastTransaction = transactions.at(-1);
+      if (lastTransaction) {
+        beforeSignature = lastTransaction.transaction?.signatures[0];
+      }
+    }
+    if (accountData) {
+      const convTrans = await getTransactions(
+        connection,
+        new PublicKey(accountData.pubkey),
+        beforeSignature
+      );
+
+      const newTransactions: TransactionType[] = [...transactions];
+      convTrans
+        .sort((t, tx) => {
+          return (tx.blockTime || 0) - (t.blockTime || 0);
+        })
+        .forEach((t) => {
+          newTransactions.push(t);
+        });
+      setTransactions(newTransactions);
+    }
+    if (pubkey) {
+      const convTrans = await getTransactions(
+        connection,
+        new PublicKey(pubkey),
+        beforeSignature
+      );
+
+      const newTransactions: TransactionType[] = [...transactions];
+      convTrans
+        .sort((t, tx) => {
+          return (tx.blockTime || 0) - (t.blockTime || 0);
+        })
+        .forEach((t) => {
+          newTransactions.push(t);
+        });
+      setTransactions(newTransactions);
+    }
+  }
 
   useEffect(() => {
     async function getData() {
@@ -57,17 +100,7 @@ export default function AccountInfo() {
           ...prev!,
           assets,
         }));
-        const convTrans = await getTransactions(
-          connection,
-          new PublicKey(fullSolanaAccount.pubkey)
-        );
-        const newTransactions: TransactionType[] = [...transactions];
-        convTrans.forEach((t) => {
-          newTransactions.push(t);
-        });
-        console.log(JSON.stringify(convTrans));
-
-        setTransactions(newTransactions);
+        await fetchTransactions(fullSolanaAccount.pubkey.toString());
       }
     }
     getData();
@@ -114,7 +147,10 @@ export default function AccountInfo() {
         </>
       )}
       {transactions.length > 0 ? (
-        <TransactionTable transactions={transactions} />
+        <TransactionTable
+          transactions={transactions}
+          fetchTransactions={fetchTransactions}
+        />
       ) : null}
     </main>
   ) : null;

@@ -1,5 +1,9 @@
 "use client";
-import { getAccountData, getFullAccountData } from "@/backend/accountData";
+import {
+  getAccountData,
+  getFullAccountData,
+  getTransactions,
+} from "@/backend/accountData";
 import { convertToTokenPageType } from "@/backend/converters";
 import AccountData from "@/components/accounts/AccountData";
 import AccountDataGroup from "@/components/accounts/AccountDataGroup";
@@ -8,16 +12,65 @@ import MainInfo from "@/components/accounts/MainInfo";
 import { useSolanaAccount } from "@/components/contexts/SolanaAccountContext";
 import Title from "@/components/Title";
 import TokenChart from "@/components/TokenChart";
+import TransactionTable from "@/components/TransactionTable";
 import { TokenPageType } from "@/types/pagetypes";
+import { TransactionType } from "@/types/transaction";
 import { useConnection } from "@solana/wallet-adapter-react";
+import { PublicKey } from "@solana/web3.js";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function TokensPage() {
   const [tokenData, setTokenData] = useState<TokenPageType>();
   const { solanaAccount, setSolanaAccount } = useSolanaAccount();
+  const [transactions, setTransactions] = useState<TransactionType[]>([]);
+
   const { connection } = useConnection();
   const params = useParams();
+
+  async function fetchTransactions(pubkey?: string) {
+    let beforeSignature;
+    if (transactions.length > 0) {
+      const lastTransaction = transactions.at(-1);
+      if (lastTransaction) {
+        beforeSignature = lastTransaction.transaction?.signatures[0];
+      }
+    }
+    if (tokenData) {
+      const convTrans = await getTransactions(
+        connection,
+        new PublicKey(tokenData.pubkey),
+        beforeSignature
+      );
+
+      const newTransactions: TransactionType[] = [...transactions];
+      convTrans
+        .sort((t, tx) => {
+          return (tx.blockTime || 0) - (t.blockTime || 0);
+        })
+        .forEach((t) => {
+          newTransactions.push(t);
+        });
+      setTransactions(newTransactions);
+    }
+    if (pubkey) {
+      const convTrans = await getTransactions(
+        connection,
+        new PublicKey(pubkey),
+        beforeSignature
+      );
+
+      const newTransactions: TransactionType[] = [...transactions];
+      convTrans
+        .sort((t, tx) => {
+          return (tx.blockTime || 0) - (t.blockTime || 0);
+        })
+        .forEach((t) => {
+          newTransactions.push(t);
+        });
+      setTransactions(newTransactions);
+    }
+  }
 
   useEffect(() => {
     async function getData() {
@@ -38,6 +91,7 @@ export default function TokensPage() {
       if (fullSolanaAccount) {
         const tokenDataConv = convertToTokenPageType(fullSolanaAccount);
         setTokenData(tokenDataConv);
+        fetchTransactions(fullSolanaAccount.pubkey.toString());
       }
     }
     getData();
@@ -100,6 +154,12 @@ export default function TokensPage() {
           decimals={tokenData.decimals}
         />
       )}
+      {transactions.length > 0 ? (
+        <TransactionTable
+          transactions={transactions}
+          fetchTransactions={fetchTransactions}
+        />
+      ) : null}
     </main>
   ) : null;
 }

@@ -10,6 +10,7 @@ import { MetaDataAccount } from "../types/metadata";
 import { AccountAssets, AssetsNFT, AssetsToken } from "@/types/pagetypes";
 import { convertToTransactionType } from "./transactionConverter";
 import { TransactionType } from "@/types/transaction";
+import { before } from "node:test";
 
 export const BPF_LOADER_UPGRADE_PROGRAM_ID =
   "BPFLoaderUpgradeab1e11111111111111111111111";
@@ -327,13 +328,18 @@ export async function getCollectionData(
 
 export async function getTransactions(
   connection: Connection,
-  publicKey: PublicKey
+  publicKey: PublicKey,
+  beforeSignature?: string
 ): Promise<TransactionType[]> {
   const transactions: TransactionType[] = [];
 
+  console.log(beforeSignature);
   const signature = await connection.getSignaturesForAddress(publicKey, {
     limit: 10,
+    before: beforeSignature,
   });
+  console.log(signature);
+
   const signatures = signature.map((t) => {
     return t.signature;
   });
@@ -343,9 +349,8 @@ export async function getTransactions(
     const tx = await connection.getParsedTransaction(s, {
       maxSupportedTransactionVersion: 0,
     });
-    console.log(JSON.stringify(tx));
+
     const convTx = convertToTransactionType(tx);
-    console.log(JSON.stringify(convTx));
 
     if (convTx) {
       transactions.push(convTx);
@@ -353,7 +358,6 @@ export async function getTransactions(
     return convTx;
   });
   await Promise.all(promise);
-  console.log(JSON.stringify(transactions));
 
   return transactions;
 }
