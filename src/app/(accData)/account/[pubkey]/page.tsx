@@ -109,7 +109,7 @@ export default function AccountInfo() {
   return accountData ? (
     <main className="flex flex-col xl:max-w-[1300px] 2xl:max-w-[1700px] mx-auto ">
       <Title title="Account" />
-      <div className="w-full flex justify-center items-start">
+      <div className="w-full flex justify-center items-start bg-dark">
         <AccountDataGroup>
           <AccountDataRow>
             <AccountData pubkey={accountData.pubkey} title="Pubkey" />
@@ -129,17 +129,17 @@ export default function AccountInfo() {
       {accountData.assets !== null && (
         <>
           {accountData.assets.assetsToken.length > 0 && (
-            <div className="flex flex-col justify-center items-center xl:max-w-[1300px] 2xl:max-w-[1700px] mx-auto my-9 p-5 bg-dark">
-              <Title title="TOKEN" />
-              <div className="flex justify-center items-center xl:max-w-[1300px] 2xl:max-w-[1700px] mx-auto my-9">
+            <div className="flex flex-col justify-center items-center xl:max-w-[1300px] 2xl:max-w-[1700px] mx-auto my-9">
+              <Title title="TOKENS" />
+              <div className="flex justify-center items-center xl:max-w-[1300px] 2xl:max-w-[1700px] mx-auto my-9 p-10 bg-dark">
                 <SwiperData tokenAssets={accountData.assets.assetsToken} />
               </div>
             </div>
           )}
           {accountData.assets.assetsNft.length > 0 && (
-            <div className="flex flex-col justify-center items-center xl:max-w-[1300px] 2xl:max-w-[1700px] mx-auto my-9 p-5 bg-dark">
+            <div className="flex flex-col justify-center items-center xl:max-w-[1300px] 2xl:max-w-[1700px] mx-auto my-9 ">
               <Title title="NFT" />
-              <div className="flex justify-center items-center xl:max-w-[1300px] 2xl:max-w-[1700px] mx-auto my-9">
+              <div className="flex justify-center items-center xl:max-w-[1300px] 2xl:max-w-[1700px] mx-auto my-9 p-10 bg-dark">
                 <SwiperData nftAssets={accountData.assets.assetsNft} />
               </div>
             </div>
