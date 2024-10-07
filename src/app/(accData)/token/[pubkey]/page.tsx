@@ -76,12 +76,14 @@ export default function TokensPage() {
     async function getData() {
       let fullSolanaAccount;
       if (solanaAccount) {
+        fetchTransactions(solanaAccount.pubkey.toString());
         fullSolanaAccount = await getAccountData(
           connection,
           solanaAccount.pubkey,
           solanaAccount
         );
       } else {
+        fetchTransactions(params.pubkey as string);
         fullSolanaAccount = await getFullAccountData(
           connection,
           params.pubkey as string
@@ -91,7 +93,6 @@ export default function TokensPage() {
       if (fullSolanaAccount) {
         const tokenDataConv = convertToTokenPageType(fullSolanaAccount);
         setTokenData(tokenDataConv);
-        fetchTransactions(fullSolanaAccount.pubkey.toString());
       }
     }
     getData();

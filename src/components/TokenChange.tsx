@@ -76,7 +76,7 @@ const TokenChange = ({ accounts, preToken, afterToken }: TokenChangeProps) => {
           </tbody>
         </table>
       ) : (
-        <h2 className="text-4xl text-center">NO TOKEN BALANCE CHANGES</h2>
+        <h2 className="text-4xl text-center p-10">NO TOKEN BALANCE CHANGES</h2>
       )}
     </div>
   );

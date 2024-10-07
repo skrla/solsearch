@@ -332,34 +332,35 @@ export async function getTransactions(
   beforeSignature?: string
 ): Promise<TransactionType[]> {
   const transactions: TransactionType[] = [];
-
-  console.log(beforeSignature);
-  const signature = await connection.getSignaturesForAddress(publicKey, {
-    limit: 10,
-    before: beforeSignature,
-  });
-  console.log(signature);
-
-  const signatures = signature.map((t) => {
-    return t.signature;
-  });
-
-  const promise = signatures.map(async (s) => {
-    await delay(1000);
-    const tx = await connection.getParsedTransaction(s, {
-      maxSupportedTransactionVersion: 0,
+  try {
+    const signature = await connection.getSignaturesForAddress(publicKey, {
+      limit: 10,
+      before: beforeSignature,
+    });
+    const signatures = signature.map((t) => {
+      return t.signature;
     });
 
-    const convTx = convertToTransactionType(tx);
+    const promise = signatures.map(async (s) => {
+      await delay(1000);
+      const tx = await connection.getParsedTransaction(s, {
+        maxSupportedTransactionVersion: 0,
+      });
 
-    if (convTx) {
-      transactions.push(convTx);
-    }
-    return convTx;
-  });
-  await Promise.all(promise);
+      const convTx = convertToTransactionType(tx);
 
-  return transactions;
+      if (convTx) {
+        transactions.push(convTx);
+      }
+      return convTx;
+    });
+    await Promise.all(promise);
+
+    return transactions;
+  } catch (e) {
+    await delay(1000);
+    return await getTransactions(connection, publicKey, beforeSignature);
+  }
 }
 
 //TODO: Remove delay, temporary here because of Helius 10 requests per second limit

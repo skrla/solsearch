@@ -93,12 +93,14 @@ export default function NFTPage() {
     async function getData() {
       let fullSolanaAccount;
       if (solanaAccount) {
+        fetchTransactions(solanaAccount.pubkey.toString());
         fullSolanaAccount = await getAccountData(
           connection,
           solanaAccount.pubkey,
           solanaAccount
         );
       } else {
+        fetchTransactions(params.pubkey as string);
         fullSolanaAccount = await getFullAccountData(
           connection,
           params.pubkey as string
@@ -119,7 +121,6 @@ export default function NFTPage() {
           );
           setCollection(coll);
         }
-        await fetchTransactions(fullSolanaAccount.pubkey.toString());
       }
     }
     getData();
@@ -132,7 +133,7 @@ export default function NFTPage() {
   }, [nftData]);
 
   return nftData ? (
-    <main className="flex flex-col xl:max-w-[1300px] 2xl:max-w-[1700px] mx-auto ">
+    <main className="flex flex-col xl:max-w-[1300px] 2xl:max-w-[1700px] mx-auto mb-9 ">
       <Title title={solanaAccount?.data === null ? "cNFT" : "NFT"} />
       <div className="w-full flex justify-center items-start">
         <MainInfo img={nftData.image || ""} />
@@ -209,21 +210,24 @@ export default function NFTPage() {
             <AccountData name={nftData.description} title="NFT description" />
           </AccountDataRow>
         </AccountDataGroup>
-        {collection.length > 0 && (
-          <div className="flex flex-col justify-center items-center xl:max-w-[1300px] 2xl:max-w-[1700px] mx-auto my-9 p-5 bg-dark">
-            <Title title="Collection" />
-            <div className="flex justify-center items-center xl:max-w-[1300px] 2xl:max-w-[1700px] mx-auto my-9">
-              <SwiperData nftAssets={collection} />
-            </div>
-          </div>
-        )}
       </div>
+      {collection.length > 0 && (
+        <div className="flex flex-col justify-center items-center xl:max-w-[1300px] 2xl:max-w-[1700px] mx-auto my-9 p-5">
+          <Title title="Collection" />
+          <div className="flex justify-center items-center xl:max-w-[1300px] 2xl:max-w-[1700px] mx-auto my-9 p-5 bg-dark">
+            <SwiperData nftAssets={collection} />
+          </div>
+        </div>
+      )}
       {transactions.length > 0 ? (
+        <div className="flex justify-center items-center xl:max-w-[1300px] 2xl:max-w-[1700px] mx-auto my-9 p-5">
         <TransactionTable
           transactions={transactions}
           fetchTransactions={fetchTransactions}
         />
+              </div>
       ) : null}
+
     </main>
   ) : null;
 }

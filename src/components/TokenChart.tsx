@@ -115,7 +115,7 @@ const TokenChart = ({ mintPubkey, name, decimals }: TokenChartProps) => {
   };
 
   return (
-    <div className="flex w-full h-[600px] p-5 items-center justify-center xl:max-w-[1000px] 2xl:max-w-[1400px] mx-auto bg-dark text-white">
+    <div className="flex w-full h-[600px] p-5 items-center justify-center xl:max-w-[1000px] 2xl:max-w-[1400px] mx-auto bg-dark text-white my-9">
       {chartData ? (
         <Line data={chartData} options={options} />
       ) : (

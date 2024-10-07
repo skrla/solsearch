@@ -78,12 +78,14 @@ export default function AccountInfo() {
     async function getData() {
       let fullSolanaAccount;
       if (solanaAccount) {
+        fetchTransactions(solanaAccount.pubkey.toString());
         fullSolanaAccount = await getAccountData(
           connection,
           solanaAccount.pubkey,
           solanaAccount
         );
       } else {
+        fetchTransactions(params.pubkey as string);
         fullSolanaAccount = await getFullAccountData(
           connection,
           params.pubkey as string
@@ -100,14 +102,13 @@ export default function AccountInfo() {
           ...prev!,
           assets,
         }));
-        await fetchTransactions(fullSolanaAccount.pubkey.toString());
       }
     }
     getData();
   }, []);
 
   return accountData ? (
-    <main className="flex flex-col xl:max-w-[1300px] 2xl:max-w-[1700px] mx-auto ">
+    <main className="flex flex-col xl:max-w-[1300px] 2xl:max-w-[1700px] mx-auto my-9">
       <Title title="Account" />
       <div className="w-full flex justify-center items-start bg-dark">
         <AccountDataGroup>
@@ -129,7 +130,7 @@ export default function AccountInfo() {
       {accountData.assets !== null && (
         <>
           {accountData.assets.assetsToken.length > 0 && (
-            <div className="flex flex-col justify-center items-center xl:max-w-[1300px] 2xl:max-w-[1700px] mx-auto my-9">
+            <div className="flex flex-col justify-center items-center xl:max-w-[1300px] 2xl:max-w-[1700px] mx-auto">
               <Title title="TOKENS" />
               <div className="flex justify-center items-center xl:max-w-[1300px] 2xl:max-w-[1700px] mx-auto my-9 p-10 bg-dark">
                 <SwiperData tokenAssets={accountData.assets.assetsToken} />
@@ -147,10 +148,12 @@ export default function AccountInfo() {
         </>
       )}
       {transactions.length > 0 ? (
-        <TransactionTable
-          transactions={transactions}
-          fetchTransactions={fetchTransactions}
-        />
+        <div className="flex justify-center items-center my-9">
+          <TransactionTable
+            transactions={transactions}
+            fetchTransactions={fetchTransactions}
+          />
+        </div>
       ) : null}
     </main>
   ) : null;

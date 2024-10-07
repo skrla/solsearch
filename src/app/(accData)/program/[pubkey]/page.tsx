@@ -91,12 +91,14 @@ export default function ProgramAccount() {
     async function getData() {
       let fullSolanaAccount;
       if (solanaAccount) {
+        fetchTransactions(solanaAccount.pubkey.toString());
         fullSolanaAccount = await getAccountData(
           connection,
           solanaAccount.pubkey,
           solanaAccount
         );
       } else {
+        fetchTransactions(params.pubkey as string);
         fullSolanaAccount = await getFullAccountData(
           connection,
           params.pubkey as string
@@ -105,7 +107,6 @@ export default function ProgramAccount() {
       setSolanaAccount(fullSolanaAccount ? fullSolanaAccount : null);
       if (fullSolanaAccount) {
         setProgramData(convertToProgramPageType(fullSolanaAccount));
-        await fetchTransactions(fullSolanaAccount.pubkey.toString());
       }
     }
     getData();
@@ -144,7 +145,7 @@ export default function ProgramAccount() {
               <div className="flex flex-1 flex-col gap-1 items-start justify-start p-4">
                 <FieldTitle title="Data" />
                 <div
-                  className="flex w-full text-white text-sm gap-2 cursor-pointer"
+                  className="flex w-full text-white items-center text-sm gap-2 cursor-pointer"
                   onClick={downloadData}
                 >
                   <p>{programData.sizeInKb} Kb</p>

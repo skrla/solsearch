@@ -323,7 +323,7 @@ export function convertToProgramPageType(
 
   return {
     pubkey: solanaAccount.pubkey.toString(),
-    type: type,
+    type: type === "program" ? "Program" : "Program data",
     balance: balance,
     executable: solanaAccount.executable || false,
     executableDataAccount: executableDataAccount,
