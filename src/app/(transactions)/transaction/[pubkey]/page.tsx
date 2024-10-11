@@ -1,12 +1,10 @@
 "use client";
 import { convertToTransactionType } from "@/backend/transactionConverter";
-import RowTitle from "@/components/accounts/RowTitle";
-import BalanceTable from "@/components/BalanceTable";
+import BalanceTable from "@/components/tables/BalanceTable";
 import Title from "@/components/Title";
 import TokenChange from "@/components/TokenChange";
 import { TransactionType } from "@/types/transaction";
 import { useConnection } from "@solana/wallet-adapter-react";
-import { ParsedTransactionWithMeta, Transaction } from "@solana/web3.js";
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
@@ -49,7 +47,11 @@ const TransactionPage = () => {
           </p>
         );
       } else {
-        return <p key={index}>{tx}</p>;
+        return (
+          <p className="text-white" key={index}>
+            {tx}
+          </p>
+        );
       }
     } else {
       if (tx.includes("invoke")) {
@@ -70,7 +72,11 @@ const TransactionPage = () => {
       } else if (tx.includes("log: Instruction")) {
         const logContent = tx.slice(13);
         return (
-          <p key={index} style={{ paddingLeft: `${24 * padding}px` }}>
+          <p
+            key={index}
+            className="text-white"
+            style={{ paddingLeft: `${24 * padding}px` }}
+          >
             Program logged: "{logContent}"
           </p>
         );
@@ -86,7 +92,11 @@ const TransactionPage = () => {
         );
       } else {
         return (
-          <p key={index} style={{ paddingLeft: `${24 * padding}px` }}>
+          <p
+            key={index}
+            className="text-white"
+            style={{ paddingLeft: `${24 * padding}px` }}
+          >
             {tx}
           </p>
         );
@@ -116,7 +126,7 @@ const TransactionPage = () => {
       <div className="flex flex-col w-full mt-7">
         <div className="flex space-x-4 ">
           <button
-            className={`p-2 border-2 border-b-0 rounded-t-2xl ${
+            className={`p-2 border-2 border-b-0 rounded-t-2xl text-placeholder ${
               activeTab === 0
                 ? "border-border bg-dark text-placeholder"
                 : "border-transparent"
@@ -126,10 +136,8 @@ const TransactionPage = () => {
             Balance change
           </button>
           <button
-            className={`p-2 border-2 border-b-0 rounded-t-2xl ${
-              activeTab === 1
-                ? "border-border bg-dark text-placeholder"
-                : "border-transparent"
+            className={`p-2 border-2 border-b-0 rounded-t-2xl text-placeholder ${
+              activeTab === 1 ? "border-border bg-dark " : "border-transparent"
             }`}
             onClick={() => setActiveTab(1)}
           >
@@ -178,7 +186,7 @@ const TransactionPage = () => {
                 Pretty
               </span>
               <span
-                className={`absolute left-2 text-sm font-medium text-gray-100 ${
+                className={`absolute left-2 text-sm font-medium text-placeholder ${
                   isPretty ? "hidden" : ""
                 }`}
               >
@@ -192,12 +200,12 @@ const TransactionPage = () => {
             isPretty ? (
               <div>{renderTxLog(tx, index)}</div>
             ) : index + 1 < 10 ? (
-              <pre>
+              <pre className="text-white">
                 {" "}
                 {index + 1} {tx}
               </pre>
             ) : (
-              <pre>
+              <pre className="text-white">
                 {index + 1} {tx}
               </pre>
             )

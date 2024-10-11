@@ -1,5 +1,5 @@
 import React from "react";
-import FieldString from "./accounts/fields/FieldString";
+import FieldString from "../accounts/fields/FieldString";
 import { AccountKeysTransaction } from "@/types/transaction";
 
 type BalanceTableProps = {

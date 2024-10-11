@@ -2,7 +2,6 @@
 import {
   getAccountData,
   getFullAccountData,
-  getTransactions,
 } from "@/backend/accountData";
 import { convertToProgramPageType } from "@/backend/converters";
 import AccountData from "@/components/accounts/AccountData";
@@ -16,14 +15,11 @@ import { ProgramPageType } from "@/types/pagetypes";
 import { useConnection } from "@solana/wallet-adapter-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { TransactionType } from "@/types/transaction";
-import { PublicKey } from "@solana/web3.js";
-import TransactionTable from "@/components/TransactionTable";
+import TransactionTable from "@/components/tables/TransactionTable";
 
 export default function ProgramAccount() {
   const { solanaAccount, setSolanaAccount } = useSolanaAccount();
   const [programData, setProgramData] = useState<ProgramPageType>();
-  const [transactions, setTransactions] = useState<TransactionType[]>([]);
 
   const { connection } = useConnection();
   const params = useParams();
@@ -43,62 +39,16 @@ export default function ProgramAccount() {
     }
   };
 
-  async function fetchTransactions(pubkey?: string) {
-    let beforeSignature;
-    if (transactions.length > 0) {
-      const lastTransaction = transactions.at(-1);
-      if (lastTransaction) {
-        beforeSignature = lastTransaction.transaction?.signatures[0];
-      }
-    }
-    if (programData) {
-      const convTrans = await getTransactions(
-        connection,
-        new PublicKey(programData.pubkey),
-        beforeSignature
-      );
-
-      const newTransactions: TransactionType[] = [...transactions];
-      convTrans
-        .sort((t, tx) => {
-          return (tx.blockTime || 0) - (t.blockTime || 0);
-        })
-        .forEach((t) => {
-          newTransactions.push(t);
-        });
-      setTransactions(newTransactions);
-    }
-    if (pubkey) {
-      const convTrans = await getTransactions(
-        connection,
-        new PublicKey(pubkey),
-        beforeSignature
-      );
-
-      const newTransactions: TransactionType[] = [...transactions];
-      convTrans
-        .sort((t, tx) => {
-          return (tx.blockTime || 0) - (t.blockTime || 0);
-        })
-        .forEach((t) => {
-          newTransactions.push(t);
-        });
-      setTransactions(newTransactions);
-    }
-  }
-
   useEffect(() => {
     async function getData() {
       let fullSolanaAccount;
       if (solanaAccount) {
-        fetchTransactions(solanaAccount.pubkey.toString());
         fullSolanaAccount = await getAccountData(
           connection,
           solanaAccount.pubkey,
           solanaAccount
         );
       } else {
-        fetchTransactions(params.pubkey as string);
         fullSolanaAccount = await getFullAccountData(
           connection,
           params.pubkey as string
@@ -164,12 +114,9 @@ export default function ProgramAccount() {
           </AccountDataRow>
         </AccountDataGroup>
       </div>
-      {transactions.length > 0 ? (
-        <TransactionTable
-          transactions={transactions}
-          fetchTransactions={fetchTransactions}
-        />
-      ) : null}
+      <div className="flex justify-center items-center my-9">
+        <TransactionTable />
+      </div>
     </main>
   ) : null;
 }

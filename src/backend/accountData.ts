@@ -358,7 +358,7 @@ export async function getTransactions(
 
     return transactions;
   } catch (e) {
-    await delay(1000);
+    await delay(3000);
     return await getTransactions(connection, publicKey, beforeSignature);
   }
 }

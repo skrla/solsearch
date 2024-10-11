@@ -14,14 +14,11 @@ import {
   getAccountData,
   getCollectionData,
   getFullAccountData,
-  getTransactions,
 } from "@/backend/accountData";
 import { useConnection } from "@solana/wallet-adapter-react";
 import { useParams } from "next/navigation";
 import SwiperData from "@/components/SwiperData";
-import { TransactionType } from "@/types/transaction";
-import { PublicKey } from "@solana/web3.js";
-import TransactionTable from "@/components/TransactionTable";
+import TransactionTable from "@/components/tables/TransactionTable";
 
 export default function NFTPage() {
   const { solanaAccount, setSolanaAccount } = useSolanaAccount();
@@ -31,8 +28,6 @@ export default function NFTPage() {
   const [chunkedAttributes, setChunkedAttributes] = useState<NFTAttribute[][]>(
     []
   );
-  const [transactions, setTransactions] = useState<TransactionType[]>([]);
-
   const [collection, setCollection] = useState<AssetsNFT[]>([]);
 
   const fillChunkedAttributes = () => {
@@ -45,62 +40,16 @@ export default function NFTPage() {
     }
   };
 
-  async function fetchTransactions(pubkey?: string) {
-    let beforeSignature;
-    if (transactions.length > 0) {
-      const lastTransaction = transactions.at(-1);
-      if (lastTransaction) {
-        beforeSignature = lastTransaction.transaction?.signatures[0];
-      }
-    }
-    if (nftData) {
-      const convTrans = await getTransactions(
-        connection,
-        new PublicKey(nftData.pubkey),
-        beforeSignature
-      );
-
-      const newTransactions: TransactionType[] = [...transactions];
-      convTrans
-        .sort((t, tx) => {
-          return (tx.blockTime || 0) - (t.blockTime || 0);
-        })
-        .forEach((t) => {
-          newTransactions.push(t);
-        });
-      setTransactions(newTransactions);
-    }
-    if (pubkey) {
-      const convTrans = await getTransactions(
-        connection,
-        new PublicKey(pubkey),
-        beforeSignature
-      );
-
-      const newTransactions: TransactionType[] = [...transactions];
-      convTrans
-        .sort((t, tx) => {
-          return (tx.blockTime || 0) - (t.blockTime || 0);
-        })
-        .forEach((t) => {
-          newTransactions.push(t);
-        });
-      setTransactions(newTransactions);
-    }
-  }
-
   useEffect(() => {
     async function getData() {
       let fullSolanaAccount;
       if (solanaAccount) {
-        fetchTransactions(solanaAccount.pubkey.toString());
         fullSolanaAccount = await getAccountData(
           connection,
           solanaAccount.pubkey,
           solanaAccount
         );
       } else {
-        fetchTransactions(params.pubkey as string);
         fullSolanaAccount = await getFullAccountData(
           connection,
           params.pubkey as string
@@ -219,15 +168,9 @@ export default function NFTPage() {
           </div>
         </div>
       )}
-      {transactions.length > 0 ? (
-        <div className="flex justify-center items-center xl:max-w-[1300px] 2xl:max-w-[1700px] mx-auto my-9 p-5">
-        <TransactionTable
-          transactions={transactions}
-          fetchTransactions={fetchTransactions}
-        />
-              </div>
-      ) : null}
-
+      <div className="flex justify-center items-center my-9">
+        <TransactionTable />
+      </div>
     </main>
   ) : null;
 }
